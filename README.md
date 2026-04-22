@@ -142,6 +142,29 @@ If you find a bug:
 
 ---
 
+## 🔐 Google reCAPTCHA Configuration
+
+SENTINALL uses human verification to prevent automated bypasses. To ensure this works correctly, you must use the specific version below:
+
+**Required Version**: `reCAPTCHA v2` (The "I'm not a robot" Checkbox)
+1.  Go to the [Google reCAPTCHA Admin Console](https://www.google.com/recaptcha/admin).
+2.  Create a new site and select **reCAPTCHA v2** -> **"I'm not a robot" Checkbox**.
+3.  Add your domain (e.g., `sentinall.vercel.app`) to the allowed list.
+4.  Copy the **Site Key** and **Secret Key** into your Operator Settings in the SENTINALL Dashboard.
+
+> [!IMPORTANT]
+> Do NOT use reCAPTCHA v3 or the "Invisible" version, as the current SENTINALL UI is optimized for the v2 challenge-response flow.
+
+---
+
+## 🛠️ Post-Mortem: The 500 Error Fix
+In version 1.0.1, a `CRITICAL_RUNTIME_ERROR` was identified and patched:
+*   **The Cause**: A logic failure occurred when the system attempted to fetch security settings for a link whose owner record had been de-synchronized.
+*   **The Fix**: Implemented a "Safety Guard" that validates user existence before every verification step.
+*   **Mobile UI**: Refactored the error page typography to use responsive scaling, preventing text overflow on high-density mobile displays.
+
+---
+
 ## 📢 Community & Support
 
 Stay updated with the latest guard logic updates and community nodes:
