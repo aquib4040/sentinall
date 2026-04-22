@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block title %}SENTINALL // High-Stakes URL Shortening{% endblock %}
+
+{% block content %}
+<div class="relative w-full max-w-5xl mx-auto py-20 px-6">
+    <!-- Hero Section -->
+    <div class="text-center mb-24 relative">
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-primary/10 rounded-full blur-[120px] -z-10 animate-pulse"></div>
+        
+        <div class="inline-flex items-center gap-3 px-4 py-2 bg-primary/5 rounded-full border border-primary/20 mb-8 backdrop-blur-sm">
+            <span class="material-symbols-outlined text-primary text-sm">security</span>
+            <span class="text-[10px] font-black tracking-[0.3em] text-primary uppercase">Military Grade Redirection</span>
+        </div>
+        
+        <h1 class="text-6xl md:text-8xl font-black tracking-tighter text-on-surface mb-8 leading-[0.9]">
+            SECURE YOUR<br/>
+            <span class="text-transparent bg-clip-text bg-gradient-to-r from-primary via-secondary to-tertiary">SENTINALL LINKS</span>
+        </h1>
+        
+        <p class="text-xl text-on-surface-variant max-w-2xl mx-auto mb-12 font-medium leading-relaxed">
+            The professional choice for anime content creators. Robust bypass detection, device fingerprinting, and granular analytics.
+        </p>
+        
+        <div class="flex flex-col sm:flex-row items-center justify-center gap-6">
+            <a href="{{ url_for('auth.register') }}" class="px-10 py-5 bg-primary text-on-primary font-black tracking-[0.2em] uppercase rounded-2xl shadow-[0_0_30px_rgba(204,151,255,0.4)] hover:scale-105 active:scale-95 transition-all">
+                Join the Network
+            </a>
+            <a href="{{ url_for('auth.login') }}" class="px-10 py-5 bg-surface-container-high border border-outline-variant/30 text-on-surface font-black tracking-[0.2em] uppercase rounded-2xl hover:bg-surface-bright transition-all">
+                Operator Login
+            </a>
+        </div>
+    </div>
+
+    <!-- Features Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-32">
+        <div class="glass-panel p-10 rounded-3xl border border-outline-variant/10 hover:border-secondary/30 transition-all">
+            <div class="w-16 h-16 rounded-2xl bg-secondary/10 flex items-center justify-center mb-8">
+                <span class="material-symbols-outlined text-secondary" style="font-size: 32px;">verified_user</span>
+            </div>
+            <h3 class="text-xl font-black text-on-surface uppercase mb-4 tracking-tight">Anti-Bypass Tech</h3>
+            <p class="text-on-surface-variant text-sm leading-relaxed">
+                Advanced referer and IP consistency checks to ensure your revenue remains secure from malicious scripts.
+            </p>
+        </div>
+        <div class="glass-panel p-10 rounded-3xl border border-outline-variant/10 hover:border-primary/30 transition-all">
+            <div class="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mb-8">
+                <span class="material-symbols-outlined text-primary" style="font-size: 32px;">analytics</span>
+            </div>
+            <h3 class="text-xl font-black text-on-surface uppercase mb-4 tracking-tight">Live Intelligence</h3>
+            <p class="text-on-surface-variant text-sm leading-relaxed">
+                Real-time tracking of link propagation, completion rates, and detected bypass attempts.
+            </p>
+        </div>
+        <div class="glass-panel p-10 rounded-3xl border border-outline-variant/10 hover:border-tertiary/30 transition-all">
+            <div class="w-16 h-16 rounded-2xl bg-tertiary/10 flex items-center justify-center mb-8">
+                <span class="material-symbols-outlined text-tertiary" style="font-size: 32px;">devices</span>
+            </div>
+            <h3 class="text-xl font-black text-on-surface uppercase mb-4 tracking-tight">Multi-Layer Auth</h3>
+            <p class="text-on-surface-variant text-sm leading-relaxed">
+                Configurable reCAPTCHA thresholds and browser environment restrictions for maximum control.
+            </p>
+        </div>
+    </div>
+    
+    <!-- Footer CTA -->
+    <div class="surface-container p-12 rounded-[40px] border border-outline-variant/10 text-center relative overflow-hidden">
+        <div class="absolute top-0 right-0 w-64 h-64 bg-secondary/5 rounded-full blur-3xl"></div>
+        <h2 class="text-3xl font-black text-on-surface uppercase mb-6 tracking-tighter">Ready to stabilize your links?</h2>
+        <p class="text-on-surface-variant mb-10 max-w-xl mx-auto">Initialize your operator node today and take full control of your digital distribution.</p>
+        <a href="{{ url_for('auth.register') }}" class="text-secondary font-black tracking-[0.2em] uppercase flex items-center justify-center gap-2 hover:underline">
+            Begin Enrollment <span class="material-symbols-outlined">arrow_forward</span>
+        </a>
+    </div>
+</div>
+{% endblock %}

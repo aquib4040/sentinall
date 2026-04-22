@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container-high": "#141f38",
+                        "surface-container-lowest": "#000000",
+                        "on-surface-variant": "#a3aac4",
+                        "surface-dim": "#060e20",
+                        "inverse-surface": "#faf8ff",
+                        "on-error-container": "#ffb2b9",
+                        "surface-container": "#0f1930",
+                        "primary-container": "#c284ff",
+                        "primary-fixed": "#c284ff",
+                        "on-secondary": "#004b56",
+                        "on-surface": "#dee5ff",
+                        "secondary-fixed-dim": "#29d6f1",
+                        "on-primary-container": "#360061",
+                        "tertiary-fixed-dim": "#f976ba",
+                        "inverse-on-surface": "#4d556b",
+                        "on-tertiary-fixed": "#360021",
+                        "primary-dim": "#9c48ea",
+                        "on-primary": "#47007c",
+                        "outline-variant": "#40485d",
+                        "on-error": "#490013",
+                        "error": "#ff6e84",
+                        "tertiary-container": "#f673b7",
+                        "on-tertiary": "#5f003e",
+                        "on-tertiary-container": "#4a002f",
+                        "surface-container-low": "#091328",
+                        "surface-bright": "#1f2b49",
+                        "surface": "#060e20",
+                        "primary": "#cc97ff",
+                        "on-primary-fixed-variant": "#430076",
+                        "secondary-dim": "#1ad0eb",
+                        "on-secondary-container": "#eafbff",
+                        "outline": "#6d758c",
+                        "tertiary": "#ff86c3",
+                        "on-secondary-fixed": "#003a43",
+                        "on-tertiary-fixed-variant": "#73004b",
+                        "surface-container-highest": "#192540",
+                        "secondary-fixed": "#48e4ff",
+                        "secondary-container": "#006877",
+                        "error-dim": "#d73357",
+                        "on-secondary-fixed-variant": "#005966",
+                        "background": "#060e20",
+                        "tertiary-fixed": "#ff8bc5",
+                        "tertiary-dim": "#f271b5",
+                        "surface-variant": "#192540",
+                        "on-background": "#dee5ff",
+                        "primary-fixed-dim": "#b971ff",
+                        "surface-tint": "#cc97ff",
+                        "secondary": "#3adffa",
+                        "error-container": "#a70138",
+                        "on-primary-fixed": "#000000",
+                        "inverse-primary": "#842cd3"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "fontFamily": {
+                        "headline": ["Inter"],
+                        "display": ["Inter"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+        }
+        .anime-grid {
+            background-image: radial-gradient(circle at 2px 2px, rgba(64, 72, 93, 0.15) 1px, transparent 0);
+            background-size: 24px 24px;
+        }
+        .glass-panel {
+            background: rgba(15, 25, 48, 0.6);
+            backdrop-filter: blur(20px);
+        }
+        .glow-cyan {
+            box-shadow: 0 0 15px rgba(58, 223, 250, 0.4);
+        }
+        .glow-purple {
+            box-shadow: 0 0 15px rgba(204, 151, 255, 0.2);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-surface font-body selection:bg-secondary/30">
+<!-- TopAppBar -->
+<header class="flex justify-between items-center px-6 py-4 w-full sticky top-0 bg-[#060e20]/80 backdrop-blur-xl z-50 border-b border-[#40485d]/20 shadow-[0_0_15px_rgba(204,151,255,0.08)]">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-[#9D4EDD] cursor-pointer hover:text-cyan-400 transition-colors" data-icon="grid_view">grid_view</span>
+<h1 class="text-xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-[#9c48ea] to-[#cc97ff]">SENTINALL</h1>
+</div>
+<div class="flex items-center gap-6">
+<nav class="hidden md:flex gap-8">
+<a class="font-['Inter'] uppercase tracking-[0.2em] font-bold text-sm text-[#a3aac4] hover:text-cyan-300 transition-colors duration-300" href="#">LINK</a>
+<a class="font-['Inter'] uppercase tracking-[0.2em] font-bold text-sm text-[#a3aac4] hover:text-cyan-300 transition-colors duration-300" href="#">ARCHIVE</a>
+</nav>
+<div class="w-10 h-10 rounded-full border border-primary/30 overflow-hidden">
+<img alt="User Profile Avatar" class="w-full h-full object-cover" data-alt="abstract tech avatar with purple and cyan light streaks against a dark background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCaFgzRhsu4KmlMEp3Gbctp5MfXt_7jN-EWPe-2V9p3XFGvLXtJBjD04QwSqxS6-5wqBrsBdMtxmbjeIVl85fNLIDNEwA34eute-libqvAc3W_Udg_EpnEvhf9SG_p9EeLndextzGaln3Hybk0-JkKYt-IUIhCNO1bTBV9VqWknq7xxle22KsizQb3qG6JrkGAObtpLgIj245p6dHrpDpN6EJQ7AmG8lzv1YlVNF7p-Mg0Xhzry77IRPfhKNXjHTt8n132xF3XWFog"/>
+</div>
+</div>
+</header>
+<main class="min-h-[calc(100vh-140px)] flex flex-col items-center justify-center p-6 anime-grid relative overflow-hidden">
+<!-- Background Elements -->
+<div class="absolute top-1/4 -left-20 w-96 h-96 bg-primary/5 rounded-full blur-[120px]"></div>
+<div class="absolute bottom-1/4 -right-20 w-96 h-96 bg-secondary/5 rounded-full blur-[120px]"></div>
+<!-- Main HUD Card -->
+<div class="relative w-full max-w-2xl">
+<!-- Corner Accents -->
+<div class="absolute -top-2 -left-2 w-8 h-8 border-t-2 border-l-2 border-secondary/50"></div>
+<div class="absolute -bottom-2 -right-2 w-8 h-8 border-b-2 border-r-2 border-secondary/50"></div>
+<div class="glass-panel border border-outline-variant/20 rounded-lg p-8 md:p-12 shadow-[0_20px_40px_rgba(0,0,0,0.4)] flex flex-col items-center text-center">
+<!-- HUD Scanline Effect -->
+<div class="absolute inset-0 pointer-events-none overflow-hidden opacity-10 rounded-lg">
+<div class="w-full h-1 bg-secondary animate-pulse mt-4"></div>
+</div>
+<!-- Status Metadata -->
+<div class="w-full flex justify-between mb-12">
+<div class="flex flex-col items-start">
+<span class="text-[10px] font-label uppercase tracking-[0.2em] text-secondary">System_Status</span>
+<span class="text-xs font-mono text-on-surface-variant">ONLINE // SECURE</span>
+</div>
+<div class="flex flex-col items-end">
+<span class="text-[10px] font-label uppercase tracking-[0.2em] text-primary">Auth_Level</span>
+<span class="text-xs font-mono text-on-surface-variant">LEVEL_04_INITIATE</span>
+</div>
+</div>
+<!-- Main Action Text -->
+<div class="mb-10 space-y-2">
+<h2 class="text-2xl md:text-3xl font-black tracking-[0.15em] text-on-surface font-display leading-tight">
+                        ACCESSING_CANON_DATA_STREAM
+                    </h2>
+<p class="text-on-surface-variant font-body text-sm tracking-wide opacity-70">
+                        Protocol Alpha initialized. Handshake established with digital reliquary.
+                    </p>
+</div>
+<!-- Progress Bar -->
+<div class="w-full max-w-md mb-12">
+<div class="flex justify-between items-end mb-2">
+<span class="text-[10px] font-label uppercase tracking-widest text-on-surface-variant italic">Syncing...</span>
+<span class="text-sm font-black text-secondary">98%</span>
+</div>
+<div class="h-1.5 w-full bg-surface-container-highest rounded-full overflow-hidden border border-outline-variant/10">
+<div class="h-full bg-gradient-to-r from-primary to-secondary w-[98%] shadow-[0_0_8px_rgba(58,223,250,0.5)]"></div>
+</div>
+</div>
+<!-- Primary Button -->
+<button class="group relative px-12 py-4 bg-secondary text-on-secondary font-black tracking-[0.2em] uppercase rounded-full glow-cyan hover:scale-105 active:scale-95 transition-all duration-300">
+<span class="relative z-10">Initiate Link</span>
+<div class="absolute inset-0 bg-white opacity-0 group-hover:opacity-10 rounded-full transition-opacity"></div>
+</button>
+<!-- Technical Footer of Card -->
+<div class="mt-12 flex flex-wrap justify-center gap-6">
+<div class="flex items-center gap-2 px-3 py-1.5 bg-surface-container rounded border border-outline-variant/20">
+<span class="material-symbols-outlined text-[14px] text-secondary" data-icon="lock" style="font-variation-settings: 'FILL' 1;">lock</span>
+<span class="text-[9px] font-label tracking-widest text-on-surface-variant">ENCRYPTED_ENDPOINT</span>
+</div>
+<div class="flex items-center gap-2 px-3 py-1.5 bg-surface-container rounded border border-outline-variant/20">
+<span class="material-symbols-outlined text-[14px] text-primary" data-icon="shield" style="font-variation-settings: 'FILL' 1;">shield</span>
+<span class="text-[9px] font-label tracking-widest text-on-surface-variant">RECAPTCHA_ENABLED</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Asymmetrical Decorative Element -->
+<div class="hidden lg:block absolute bottom-20 left-12 transform -rotate-90 origin-left">
+<span class="text-[10px] font-label tracking-[0.5em] text-outline-variant uppercase">Archive_System_v2.0.4 // Unauthorized_Access_Prohibited</span>
+</div>
+</main>
+<!-- BottomNavBar -->
+<footer class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center pt-3 pb-6 px-4 bg-[#091328]/90 backdrop-blur-2xl border-t border-[#40485d]/20 shadow-[0_-10px_40px_rgba(0,0,0,0.4)] md:hidden">
+<div class="flex flex-col items-center text-cyan-400 drop-shadow-[0_0_8px_rgba(34,211,238,0.5)]">
+<span class="material-symbols-outlined mb-1" data-icon="bolt">bolt</span>
+<span class="font-['Inter'] text-[10px] uppercase tracking-widest font-medium">LINK</span>
+</div>
+<div class="flex flex-col items-center text-[#a3aac4] opacity-60 hover:opacity-100 hover:text-purple-400 transition-all">
+<span class="material-symbols-outlined mb-1" data-icon="database">database</span>
+<span class="font-['Inter'] text-[10px] uppercase tracking-widest font-medium">ARCHIVE</span>
+</div>
+<div class="flex flex-col items-center text-[#a3aac4] opacity-60 hover:opacity-100 hover:text-purple-400 transition-all">
+<span class="material-symbols-outlined mb-1" data-icon="sync">sync</span>
+<span class="font-['Inter'] text-[10px] uppercase tracking-widest font-medium">SYNC</span>
+</div>
+<div class="flex flex-col items-center text-[#a3aac4] opacity-60 hover:opacity-100 hover:text-purple-400 transition-all">
+<span class="material-symbols-outlined mb-1" data-icon="settings_input_component">settings_input_component</span>
+<span class="font-['Inter'] text-[10px] uppercase tracking-widest font-medium">SYSTEM</span>
+</div>
+</footer>
+</body></html>

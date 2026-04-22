@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+
+{% block title %}SENTINALL // Master Control{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto">
+    <div class="flex items-center justify-between mb-12">
+        <div>
+            <h2 class="text-3xl font-black tracking-tighter text-on-surface uppercase mb-2">MASTER_CONTROL_UNIT</h2>
+            <p class="text-xs font-mono text-on-surface-variant tracking-widest">Global platform synchronization active</p>
+        </div>
+        <div class="flex gap-4">
+            <div class="surface-container px-6 py-4 rounded-2xl border border-outline-variant/10 text-center min-w-[140px]">
+                <p class="text-[10px] font-black tracking-widest text-primary uppercase mb-1">Total Users</p>
+                <p class="text-2xl font-black text-on-surface">{{ stats.total_users }}</p>
+            </div>
+            <div class="surface-container px-6 py-4 rounded-2xl border border-outline-variant/10 text-center min-w-[140px]">
+                <p class="text-[10px] font-black tracking-widest text-secondary uppercase mb-1">Global Links</p>
+                <p class="text-2xl font-black text-on-surface">{{ stats.total_links }}</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- User Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {% for user in users %}
+        <div class="glass-panel p-6 rounded-2xl border border-outline-variant/10 hover:border-primary/30 transition-all group relative overflow-hidden">
+            <div class="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
+                <span class="material-symbols-outlined text-6xl">person</span>
+            </div>
+            
+            <div class="flex items-center gap-4 mb-6">
+                <div class="w-12 h-12 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center">
+                    <span class="material-symbols-outlined text-primary">engineering</span>
+                </div>
+                <div>
+                    <h3 class="font-black text-on-surface tracking-tight">{{ user.username }}</h3>
+                    <p class="text-[10px] font-mono text-on-surface-variant uppercase">Operator_Node</p>
+                </div>
+            </div>
+
+            <div class="space-y-3 mb-8">
+                <div class="flex justify-between text-xs font-mono">
+                    <span class="text-on-surface-variant">Active Links:</span>
+                    <span class="text-secondary font-bold">{{ user.stats.active_links }}</span>
+                </div>
+                <div class="flex justify-between text-xs font-mono">
+                    <span class="text-on-surface-variant">Bypass Ratio:</span>
+                    <span class="text-error font-bold">
+                        {% if user.stats.total_links > 0 %}
+                            {{ "%.1f"|format((user.stats.bypassed_links / user.stats.total_links) * 100) }}%
+                        {% else %}
+                            0.0%
+                        {% endif %}
+                    </span>
+                </div>
+            </div>
+
+            <div class="flex gap-2">
+                <a href="{{ url_for('admin.user_details', username=user.username) }}" class="flex-1 py-3 bg-surface-container-high border border-outline-variant/20 rounded-xl text-[10px] font-black tracking-widest text-center uppercase hover:bg-surface-bright transition-all">
+                    INSPECT_NODE
+                </a>
+                <button onclick="toggleDisable('{{ user.username }}', {{ user.is_disabled | tojson }})" class="px-4 py-3 bg-error/10 border-error/20 rounded-xl text-error hover:bg-error/20 transition-all">
+                    <span class="material-symbols-outlined text-sm">{% if user.is_disabled %}lock_open{% else %}lock{% endif %}</span>
+                </button>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    async function toggleDisable(username, currentState) {
+        if (!confirm(`Confirm ${currentState ? 'ENABLING' : 'DISABLING'} operator ${username}?`)) return;
+        
+        try {
+            const res = await fetch(`/admin/user/${username}/disable`, { method: 'POST' });
+            const data = await res.json();
+            if (data.status === 'success') {
+                window.location.reload();
+            } else {
+                alert('Error: ' + data.message);
+            }
+        } catch (err) {
+            alert('Command failed');
+        }
+    }
+</script>
+{% endblock %}

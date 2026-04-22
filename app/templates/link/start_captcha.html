@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block title %}SENTINALL // Handshake Protocol{% endblock %}
+
+{% block head %}
+<script src="https://www.google.com/recaptcha/api.js" async defer></script>
+{% endblock %}
+
+{% block content %}
+<div class="relative w-full max-w-md mx-auto">
+    <div class="glass-panel border border-outline-variant/20 rounded-lg p-8 shadow-2xl relative overflow-hidden">
+        <div class="mb-8 text-center">
+            <h1 class="font-mono text-xl text-primary font-bold tracking-tight">INITIALIZING_HANDSHAKE</h1>
+            <p class="text-on-surface-variant text-xs mt-2 uppercase tracking-widest">Prove your humanity to proceed</p>
+        </div>
+
+        <form id="startCaptchaForm" class="flex flex-col items-center">
+            <div class="g-recaptcha mb-8" data-sitekey="{{ site_key }}" data-theme="dark" data-callback="onCaptchaVerified"></div>
+            
+            <button id="submitBtn" disabled class="w-full bg-gradient-to-br from-primary-dim to-primary text-on-primary-container font-black py-4 px-6 rounded-md uppercase tracking-widest text-sm shadow-[0_0_25px_rgba(157,78,221,0.4)] disabled:opacity-30 disabled:cursor-not-allowed transition-all hover:brightness-110">
+                PROCEED_TO_CANON
+            </button>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    const submitBtn = document.getElementById('submitBtn');
+    let captchaResponse = null;
+
+    function onCaptchaVerified(response) {
+        captchaResponse = response;
+        submitBtn.disabled = false;
+    }
+
+    document.getElementById('startCaptchaForm').onsubmit = async (e) => {
+        e.preventDefault();
+        if (!captchaResponse) return;
+
+        submitBtn.disabled = true;
+        submitBtn.innerText = 'PROGESSING...';
+
+        try {
+            const res = await fetch('/verify-start-captcha', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    token: '{{ encrypted_token }}',
+                    recaptcha: captchaResponse
+                })
+            });
+            
+            const data = await res.json();
+            if (data.status === 'success') {
+                window.location.href = data.redirect_url;
+            } else {
+                alert('Error: ' + data.message);
+                grecaptcha.reset();
+                submitBtn.disabled = false;
+                submitBtn.innerText = 'PROCEED_TO_CANON';
+            }
+        } catch (err) {
+            alert('Failed to connect to server');
+            submitBtn.disabled = false;
+        }
+    };
+</script>
+{% endblock %}

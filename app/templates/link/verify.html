@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+
+{% block title %}SENTINALL // ACCESS PROTOCOL{% endblock %}
+
+{% block head %}
+<script src="https://www.google.com/recaptcha/api.js" async defer></script>
+{% endblock %}
+
+{% block content %}
+<div class="relative w-full max-w-md mx-auto">
+    <!-- HUD Card Decor -->
+    <div class="absolute -top-2 -left-2 w-5 h-5 border-t-2 border-l-2 border-primary"></div>
+    <div class="absolute -bottom-2 -right-2 w-5 h-5 border-b-2 border-r-2 border-secondary"></div>
+    
+    <!-- Glassmorphic Container -->
+    <div class="glass-panel border border-outline-variant/20 rounded-lg p-8 shadow-2xl relative overflow-hidden">
+        <!-- Access Status Header -->
+        <div class="mb-8 text-center">
+            <div class="inline-flex items-center gap-2 px-3 py-1 bg-primary/10 rounded-full border border-primary/20 mb-4">
+                <span class="w-2 h-2 bg-secondary rounded-full animate-pulse"></span>
+                <span class="font-mono text-[10px] tracking-[0.2em] text-secondary uppercase font-bold">Encrypted_Link</span>
+            </div>
+            <h1 class="font-mono text-xl md:text-2xl text-primary font-bold tracking-tight drop-shadow-[0_0_10px_rgba(204,151,255,0.4)]">
+                VERIFYING_ACCESS_PROTOCOL
+            </h1>
+            <p class="text-on-surface-variant text-xs mt-2 uppercase tracking-widest">Awaiting system validation...</p>
+        </div>
+
+        <div id="countdownArea" class="flex flex-col items-center justify-center py-6 border-y border-outline-variant/20 mb-8 gap-2 bg-surface-container-low/40">
+            <div class="font-mono text-4xl text-on-surface font-black tabular-nums tracking-tighter">
+                <span id="timer">05</span><span class="text-secondary opacity-50">s</span>
+            </div>
+            <div id="progressBar" class="flex gap-1">
+                <!-- Progress dots via JS -->
+            </div>
+        </div>
+
+        <!-- reCAPTCHA Widget -->
+        <form id="captchaForm" class="flex flex-col items-center">
+            <div class="g-recaptcha mb-8" data-sitekey="{{ site_key }}" data-theme="dark" data-callback="onCaptchaVerified"></div>
+            
+            <button id="submitBtn" disabled class="w-full bg-gradient-to-br from-primary-dim to-primary text-on-primary-container font-black py-4 px-6 rounded-md uppercase tracking-widest text-sm shadow-[0_0_25px_rgba(157,78,221,0.4)] disabled:opacity-30 disabled:cursor-not-allowed transition-all hover:brightness-110 flex items-center justify-center gap-2">
+                Verify and Continue
+                <span class="material-symbols-outlined text-sm">double_arrow</span>
+            </button>
+        </form>
+
+        <!-- Technical Metadata -->
+        <div class="mt-8 flex justify-between items-center px-2">
+            <div class="flex flex-col">
+                <span class="text-[8px] text-outline-variant uppercase font-mono tracking-widest">Protocol</span>
+                <span class="text-[10px] text-on-surface-variant font-mono">SYNTH_CANON_v4.0</span>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    let timeLeft = 5;
+    const timerEl = document.getElementById('timer');
+    const submitBtn = document.getElementById('submitBtn');
+    let captchaResponse = null;
+
+    function onCaptchaVerified(response) {
+        captchaResponse = response;
+        checkCanSubmit();
+    }
+
+    function checkCanSubmit() {
+        if (timeLeft <= 0 && captchaResponse) {
+            submitBtn.disabled = false;
+        }
+    }
+
+    const countdown = setInterval(() => {
+        timeLeft--;
+        if (timeLeft <= 0) {
+            timeLeft = 0;
+            clearInterval(countdown);
+            checkCanSubmit();
+        }
+        timerEl.innerText = timeLeft.toString().padStart(2, '0');
+    }, 1000);
+
+    document.getElementById('captchaForm').onsubmit = async (e) => {
+        e.preventDefault();
+        if (!captchaResponse) return;
+
+        submitBtn.disabled = true;
+        submitBtn.innerText = 'PROCESSING...';
+
+        try {
+            const res = await fetch('/verify-captcha', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    token: '{{ encrypted_token }}',
+                    recaptcha: captchaResponse
+                })
+            });
+            
+            const data = await res.json();
+            if (data.status === 'success') {
+                window.location.href = data.redirect_url;
+            } else {
+                if (data.bypass_detected) {
+                    window.location.reload(); // Redirect to roast page via server-side check
+                } else {
+                    alert('Error: ' + data.message);
+                    grecaptcha.reset();
+                    submitBtn.disabled = false;
+                    submitBtn.innerText = 'Verify and Continue';
+                }
+            }
+        } catch (err) {
+            alert('Failed to connect to verification server');
+            submitBtn.disabled = false;
+        }
+    };
+</script>
+{% endblock %}

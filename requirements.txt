@@ -1,0 +1,7 @@
+flask
+pymongo
+requests
+cryptography
+werkzeug
+python-dotenv
+gunicorn

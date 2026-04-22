@@ -1,0 +1,226 @@
+{% extends "base.html" %}
+
+{% block title %}SENTINALL | Link Intelligence{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto">
+    <div class="flex items-center justify-between mb-12">
+        <h2 class="text-3xl font-black tracking-tighter text-[#dee5ff] uppercase">LINK_INTELLIGENCE</h2>
+        <div class="flex items-center gap-4">
+            <select id="monthSelector" class="bg-surface-container border border-outline-variant/30 text-on-surface text-xs font-bold tracking-widest uppercase py-2 px-4 rounded-xl focus:ring-secondary focus:border-secondary transition-all">
+                <option value="{{ current_month }}">Loading months...</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Live Stats Summary -->
+    <div id="summaryStats" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-12">
+        <div class="animate-pulse bg-surface-container/50 h-32 rounded-2xl"></div>
+        <div class="animate-pulse bg-surface-container/50 h-32 rounded-2xl"></div>
+        <div class="animate-pulse bg-surface-container/50 h-32 rounded-2xl"></div>
+        <div class="animate-pulse bg-surface-container/50 h-32 rounded-2xl"></div>
+    </div>
+
+    <!-- Reports Section -->
+    <div class="space-y-8">
+        <!-- Tabs -->
+        <div class="flex gap-2 p-1 bg-surface-container/30 rounded-2xl border border-outline-variant/10 w-fit">
+            <button onclick="switchTab('daily')" class="tab-btn px-6 py-3 text-[10px] font-black tracking-[0.2em] uppercase rounded-xl transition-all active-tab" id="dailyBtn">DAILY_REPORT</button>
+            <button onclick="switchTab('monthly')" class="tab-btn px-6 py-3 text-[10px] font-black tracking-[0.2em] uppercase rounded-xl transition-all text-on-surface-variant hover:text-on-surface" id="monthlyBtn">MONTHLY_REPORT</button>
+            <button onclick="switchTab('lifetime')" class="tab-btn px-6 py-3 text-[10px] font-black tracking-[0.2em] uppercase rounded-xl transition-all text-on-surface-variant hover:text-on-surface" id="lifetimeBtn">LIFETIME_STATS</button>
+        </div>
+
+        <!-- Table Container -->
+        <div class="glass-panel rounded-2xl border border-outline-variant/10 shadow-2xl overflow-hidden">
+            <!-- Daily Content -->
+            <div id="daily" class="tab-content">
+                <table class="w-full text-left">
+                    <thead class="bg-surface-container-high/50">
+                        <tr>
+                            <th class="px-8 py-4 text-[10px] font-black tracking-[0.2em] text-on-surface-variant uppercase">Temporal_Node</th>
+                            <th class="px-8 py-4 text-[10px] font-black tracking-[0.2em] text-primary uppercase">Created</th>
+                            <th class="px-8 py-4 text-[10px] font-black tracking-[0.2em] text-secondary uppercase">Completed</th>
+                            <th class="px-8 py-4 text-[10px] font-black tracking-[0.2em] text-error uppercase">Bypassed</th>
+                            <th class="px-8 py-4 text-[10px] font-black tracking-[0.2em] text-on-surface uppercase">Active</th>
+                        </tr>
+                    </thead>
+                    <tbody id="dailyTable" class="divide-y divide-outline-variant/10">
+                        <!-- Content via JS -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Monthly Content -->
+            <div id="monthly" class="tab-content hidden">
+                <table class="w-full text-left">
+                    <thead class="bg-surface-container-high/50">
+                        <tr>
+                            <th class="px-8 py-4 text-[10px] font-black tracking-[0.2em] text-on-surface-variant uppercase">Cycle_Node</th>
+                            <th class="px-8 py-4 text-[10px] font-black tracking-[0.2em] text-primary uppercase">Created</th>
+                            <th class="px-8 py-4 text-[10px] font-black tracking-[0.2em] text-secondary uppercase">Completed</th>
+                            <th class="px-8 py-4 text-[10px] font-black tracking-[0.2em] text-error uppercase">Bypassed</th>
+                            <th class="px-8 py-4 text-[10px] font-black tracking-[0.2em] text-on-surface uppercase">Active</th>
+                        </tr>
+                    </thead>
+                    <tbody id="monthlyTable" class="divide-y divide-outline-variant/10">
+                        <!-- Content via JS -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Lifetime Content -->
+            <div id="lifetime" class="tab-content hidden p-8">
+                <div id="lifetimeData" class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <!-- Content via JS -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<style>
+    .active-tab {
+        background: #cc97ff;
+        color: #47007c;
+        box-shadow: 0 0 15px rgba(204, 151, 255, 0.4);
+    }
+</style>
+<script>
+    const appUrl = '{{ app_url }}';
+    let summaryData = {};
+
+    async function loadSummary() {
+        try {
+            const res = await fetch(`${appUrl}/api/analytics/summary`);
+            const data = await res.json();
+            if (data.status === 'success') {
+                summaryData = data;
+                renderSummary();
+                loadMonthlyData();
+            }
+        } catch (error) {
+            console.error('Error loading summary:', error);
+        }
+    }
+
+    function renderSummary() {
+        const createCard = (label, value, sub, color) => `
+            <div class="surface-container border border-outline-variant/10 p-6 rounded-2xl hover:bg-surface-bright transition-all group">
+                <p class="text-[10px] font-black tracking-[0.2em] text-on-surface-variant uppercase mb-4">${label}</p>
+                <h3 class="text-4xl font-display font-black text-${color}">${value}</h3>
+                <p class="mt-4 text-[10px] text-on-surface-variant leading-relaxed">${sub}</p>
+            </div>
+        `;
+
+        document.getElementById('summaryStats').innerHTML = `
+            ${createCard('Today_Load', summaryData.daily.total_created, `COMPL: ${summaryData.daily.total_completed} // BYPASS: ${summaryData.daily.total_bypassed}`, 'primary')}
+            ${createCard('Monthly_Load', summaryData.monthly.total_created, `COMPL: ${summaryData.monthly.total_completed} // BYPASS: ${summaryData.monthly.total_bypassed}`, 'secondary')}
+            ${createCard('Lifetime_Archive', summaryData.lifetime.total_created, `COMPL: ${summaryData.lifetime.total_completed} // BYPASS: ${summaryData.lifetime.total_bypassed}`, 'on-surface')}
+            ${createCard('Active_Nodes', summaryData.lifetime.total_active, `Currently propagating across network`, 'tertiary')}
+        `;
+    }
+
+    async function loadMonthlyData() {
+        try {
+            const res = await fetch(`${appUrl}/api/analytics/monthly`);
+            const data = await res.json();
+            if (data.status === 'success') {
+                populateMonthSelector(data.data);
+                renderMonthlyTable(data.data);
+                renderLifetimeStats();
+                loadDailyData();
+            }
+        } catch (error) {
+            console.error('Error loading monthly data:', error);
+        }
+    }
+
+    function populateMonthSelector(months) {
+        const selector = document.getElementById('monthSelector');
+        const current = '{{ current_month }}';
+        selector.innerHTML = months.map(m => 
+            `<option value="${m.month}" ${m.month === current ? 'selected' : ''}>${m.display.toUpperCase()}</option>`
+        ).join('');
+        selector.onchange = () => loadDailyData();
+    }
+
+    async function loadDailyData() {
+        const month = document.getElementById('monthSelector').value;
+        if (!month) return;
+        
+        try {
+            const res = await fetch(`${appUrl}/api/analytics/daily/${month}`);
+            const data = await res.json();
+            if (data.status === 'success') {
+                renderDailyTable(data.data);
+            }
+        } catch (error) {
+            console.error('Error loading daily data:', error);
+        }
+    }
+
+    function renderDailyTable(data) {
+        const html = data.map(d => `
+            <tr class="hover:bg-surface-bright/20 transition-colors">
+                <td class="px-8 py-5 text-sm font-bold text-on-surface">${d.date}</td>
+                <td class="px-8 py-5 text-sm font-mono text-primary">${d.created}</td>
+                <td class="px-8 py-5 text-sm font-mono text-secondary">${d.completed}</td>
+                <td class="px-8 py-5 text-sm font-mono text-error">${d.bypassed}</td>
+                <td class="px-8 py-5 text-sm font-mono text-on-surface">${d.active}</td>
+            </tr>
+        `).join('');
+        document.getElementById('dailyTable').innerHTML = html || '<tr><td colspan="5" class="p-8 text-center text-xs text-on-surface-variant">NO_DATA_ARCHIVED_FOR_PERIOD</td></tr>';
+    }
+
+    function renderMonthlyTable(data) {
+        const html = data.map(m => `
+            <tr class="hover:bg-surface-bright/20 transition-colors">
+                <td class="px-8 py-5 text-sm font-bold text-on-surface">${m.display}</td>
+                <td class="px-8 py-5 text-sm font-mono text-primary">${m.created}</td>
+                <td class="px-8 py-5 text-sm font-mono text-secondary">${m.completed}</td>
+                <td class="px-8 py-5 text-sm font-mono text-error">${m.bypassed}</td>
+                <td class="px-8 py-5 text-sm font-mono text-on-surface">${m.active}</td>
+            </tr>
+        `).join('');
+        document.getElementById('monthlyTable').innerHTML = html;
+    }
+
+    function renderLifetimeStats() {
+        const lifetime = summaryData.lifetime;
+        document.getElementById('lifetimeData').innerHTML = `
+            <div class="p-6 rounded-xl bg-surface-container/50 border border-outline-variant/10">
+                <p class="text-[10px] font-black tracking-[0.2em] text-on-surface-variant uppercase mb-2">Total_Archives</p>
+                <h4 class="text-2xl font-black text-on-surface">${lifetime.total_created}</h4>
+            </div>
+            <div class="p-6 rounded-xl bg-surface-container/50 border border-outline-variant/10">
+                <p class="text-[10px] font-black tracking-[0.2em] text-secondary uppercase mb-2">Verification_Success</p>
+                <h4 class="text-2xl font-black text-secondary">${lifetime.total_completed}</h4>
+            </div>
+            <div class="p-6 rounded-xl bg-surface-container/50 border border-outline-variant/10">
+                <p class="text-[10px] font-black tracking-[0.2em] text-error uppercase mb-2">Bypass_Detected</p>
+                <h4 class="text-2xl font-black text-error">${lifetime.total_bypassed}</h4>
+            </div>
+            <div class="p-6 rounded-xl bg-surface-container/50 border border-outline-variant/10">
+                <p class="text-[10px] font-black tracking-[0.2em] text-tertiary uppercase mb-2">Propagation_Status</p>
+                <h4 class="text-2xl font-black text-tertiary">STABLE</h4>
+            </div>
+        `;
+    }
+
+    function switchTab(tab) {
+        document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+        document.querySelectorAll('.tab-btn').forEach(el => {
+            el.classList.remove('active-tab');
+            el.classList.add('text-on-surface-variant', 'hover:text-on-surface');
+        });
+        
+        document.getElementById(tab).classList.remove('hidden');
+        document.getElementById(tab + 'Btn').classList.add('active-tab');
+        document.getElementById(tab + 'Btn').classList.remove('text-on-surface-variant', 'hover:text-on-surface');
+    }
+
+    loadSummary();
+</script>
+{% endblock %}

@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}SENTINALL // 500_SYSTEM_FAILURE{% endblock %}
+
+{% block content %}
+<div class="relative w-full max-w-2xl mx-auto text-center">
+    <div class="w-full h-full flex flex-col items-center justify-center py-20">
+        <h1 class="text-[12rem] font-black text-error/5 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 select-none">500</h1>
+        
+        <div class="relative z-10">
+            <div class="text-error text-6xl mb-8 animate-pulse">
+                <span class="material-symbols-outlined" style="font-size: 80px;">dangerous</span>
+            </div>
+            <h2 class="text-2xl font-black tracking-[0.3em] text-on-surface uppercase mb-4">CRITICAL_RUNTIME_ERROR</h2>
+            <p class="text-on-surface-variant font-mono text-sm max-w-md mx-auto mb-12">
+                A recursive fault has occurred within the core logic. System administrators have been notified of the desync.
+            </p>
+            
+            <a href="{{ url_for('main.index') }}" class="inline-flex items-center gap-3 px-8 py-4 bg-error text-on-error font-black tracking-widest uppercase rounded-xl hover:scale-105 active:scale-95 transition-all shadow-[0_0_20px_rgba(255,110,132,0.3)]">
+                <span class="material-symbols-outlined">refresh</span>
+                Retry Protocol
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>{% block title %}SENTINALL{% endblock %}</title>
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/logo.png') }}"/>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&amp;family=Material+Symbols+Outlined:wght@100..700&amp;display=swap" rel="stylesheet"/>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "background": "#060e20",
+                        "surface": "#060e20",
+                        "on-surface": "#dee5ff",
+                        "primary": "#cc97ff",
+                        "secondary": "#3adffa",
+                        "tertiary": "#ff86c3",
+                        "error": "#ff6e84",
+                        "surface-container": "#0f1930",
+                        "surface-container-high": "#141f38",
+                        "surface-container-highest": "#192540",
+                        "outline-variant": "#40485d",
+                        "on-surface-variant": "#a3aac4"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "fontFamily": {
+                        "headline": ["Inter"],
+                        "display": ["Inter"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    }
+                },
+            },
+        }
+    </script>
+    <style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .sentinall-grid {
+            background-image: 
+                linear-gradient(to right, rgba(64, 72, 93, 0.1) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(64, 72, 93, 0.1) 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+        .glass-panel {
+            background: rgba(15, 25, 48, 0.6);
+            backdrop-filter: blur(20px);
+        }
+        body {
+            min-height: 100dvh;
+        }
+    </style>
+    {% block head %}{% endblock %}
+</head>
+<body class="bg-background text-on-surface font-body selection:bg-primary selection:text-on-primary">
+    
+    {% if session.get('logged_in') or session.get('owner_logged_in') %}
+    <!-- Navigation Drawer -->
+    <aside class="fixed inset-y-0 left-0 z-[60] flex flex-col bg-[#091328] border-r border-[#40485d]/20 h-full w-72 hidden md:flex">
+        <div class="p-8 flex flex-col h-full">
+            <div class="mb-12">
+                <span class="text-xl font-bold text-[#dee5ff] tracking-tight">SENTINALL</span>
+            </div>
+            
+            <div class="flex items-center gap-4 mb-10 p-4 bg-surface-container/40 rounded-xl">
+                <div class="w-10 h-10 rounded-lg bg-primary/20 flex items-center justify-center border border-primary/30">
+                    <span class="material-symbols-outlined text-primary text-xl" style="font-variation-settings: 'FILL' 1;">person</span>
+                </div>
+                <div>
+                    <p class="font-['Inter'] font-medium text-sm tracking-widest uppercase text-[#dee5ff]">
+                        {% if session.get('owner_logged_in') %}OWNER{% else %}{{ session.get('username', 'OPERATOR') }}{% endif %}
+                    </p>
+                    <p class="text-xs text-on-surface-variant">{% if session.get('owner_logged_in') %}Administrator{% else %}Premium Tier{% endif %}</p>
+                </div>
+            </div>
+
+            <nav class="flex-1 space-y-4">
+                {% if session.get('owner_logged_in') %}
+                    <a class="flex items-center gap-4 {% if request.endpoint == 'admin.index' %}text-[#cc97ff] font-bold border-l-2 border-[#cc97ff]{% else %}text-[#a3aac4]{% endif %} pl-4 hover:bg-[#192540] hover:text-[#dee5ff] transition-all py-2 rounded" href="{{ url_for('admin.index') }}">
+                        <span class="material-symbols-outlined">admin_panel_settings</span>
+                        <span class="font-['Inter'] font-medium text-sm tracking-widest uppercase">Admin Panel</span>
+                    </a>
+                {% else %}
+                    <a class="flex items-center gap-4 {% if request.endpoint == 'dashboard.index' %}text-[#cc97ff] font-bold border-l-2 border-[#cc97ff]{% else %}text-[#a3aac4]{% endif %} pl-4 hover:bg-[#192540] hover:text-[#dee5ff] transition-all py-2 rounded" href="{{ url_for('dashboard.index') }}">
+                        <span class="material-symbols-outlined">dashboard</span>
+                        <span class="font-['Inter'] font-medium text-sm tracking-widest uppercase">Dashboard</span>
+                    </a>
+                    <a class="flex items-center gap-4 {% if request.endpoint == 'dashboard.analytics' %}text-[#cc97ff] font-bold border-l-2 border-[#cc97ff]{% else %}text-[#a3aac4]{% endif %} pl-4 hover:bg-[#192540] hover:text-[#dee5ff] transition-all py-2 rounded" href="{{ url_for('dashboard.analytics') }}">
+                        <span class="material-symbols-outlined">leaderboard</span>
+                        <span class="font-['Inter'] font-medium text-sm tracking-widest uppercase">Analytics</span>
+                    </a>
+                    <a class="flex items-center gap-4 {% if request.endpoint == 'dashboard.settings' %}text-[#cc97ff] font-bold border-l-2 border-[#cc97ff]{% else %}text-[#a3aac4]{% endif %} pl-4 hover:bg-[#192540] hover:text-[#dee5ff] transition-all py-2 rounded" href="{{ url_for('dashboard.settings') }}">
+                        <span class="material-symbols-outlined">settings</span>
+                        <span class="font-['Inter'] font-medium text-sm tracking-widest uppercase">Settings</span>
+                    </a>
+                    <a class="flex items-center gap-4 {% if request.endpoint == 'dashboard.api_docs' %}text-[#cc97ff] font-bold border-l-2 border-[#cc97ff]{% else %}text-[#a3aac4]{% endif %} pl-4 hover:bg-[#192540] hover:text-[#dee5ff] transition-all py-2 rounded" href="{{ url_for('dashboard.api_docs') }}">
+                        <span class="material-symbols-outlined">terminal</span>
+                        <span class="font-['Inter'] font-medium text-sm tracking-widest uppercase">API Docs</span>
+                    </a>
+                {% endif %}
+            </nav>
+
+            <div class="mt-auto pt-6 border-t border-outline-variant/20">
+                <a class="flex items-center gap-4 text-[#a3aac4] pl-4 hover:text-error transition-all" href="{% if session.get('owner_logged_in') %}{{ url_for('auth.owner_logout') }}{% else %}{{ url_for('auth.logout') }}{% endif %}">
+                    <span class="material-symbols-outlined">logout</span>
+                    <span class="font-['Inter'] font-medium text-sm tracking-widest uppercase">Logout</span>
+                </a>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Top AppBar -->
+    <header class="fixed top-0 right-0 left-0 md:left-72 z-50 bg-[#060e20]/60 backdrop-blur-xl flex justify-between items-center px-6 h-16 shadow-[0_0_15px_rgba(204,151,255,0.08)]">
+        <div class="flex items-center gap-4">
+            <button class="md:hidden text-[#9D4EDD]">
+                <span class="material-symbols-outlined">menu</span>
+            </button>
+            <h1 class="text-2xl font-black tracking-tighter text-[#dee5ff] drop-shadow-[0_0_8px_rgba(157,78,221,0.5)] font-['Inter'] uppercase">SENTINALL</h1>
+        </div>
+        <div class="flex items-center gap-4">
+            <span class="text-[#a3aac4] text-xs font-label uppercase tracking-widest hidden sm:inline">System Status: Online</span>
+            <div class="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center border border-primary/30">
+                <span class="material-symbols-outlined text-primary text-sm" style="font-variation-settings: 'FILL' 1;">person</span>
+            </div>
+        </div>
+    </header>
+    {% endif %}
+
+    <!-- Background grid texture -->
+    <div class="fixed inset-0 sentinall-grid pointer-events-none opacity-30 z-0"></div>
+
+    <main class="relative z-10 {% if session.get('logged_in') or session.get('owner_logged_in') %}md:ml-72 pt-24{% else %}flex items-center justify-center min-h-screen{% endif %} pb-20 px-4 sm:px-8 max-w-7xl mx-auto w-full">
+        {% block content %}{% endblock %}
+    </main>
+
+    {% if session.get('logged_in') and not session.get('owner_logged_in') %}
+    <!-- Mobile Bottom Navigation -->
+    <nav class="md:hidden fixed bottom-0 left-0 w-full flex justify-around items-center h-20 px-4 pb-safe bg-[#0f1930]/80 backdrop-blur-2xl border-t border-[#40485d]/20 z-50 rounded-t-xl shadow-[0_-10px_30px_rgba(0,0,0,0.5)]">
+        <a class="flex flex-col items-center justify-center {% if request.endpoint == 'dashboard.index' %}text-[#cc97ff] drop-shadow-[0_0_5px_rgba(204,151,255,0.8)] scale-110{% else %}text-[#a3aac4]{% endif %}" href="{{ url_for('dashboard.index') }}">
+            <span class="material-symbols-outlined">dashboard</span>
+            <span class="font-['Inter'] text-[10px] font-bold tracking-[0.1em] uppercase mt-1">Dash</span>
+        </a>
+        <a class="flex flex-col items-center justify-center {% if request.endpoint == 'dashboard.analytics' %}text-[#cc97ff] drop-shadow-[0_0_5px_rgba(204,151,255,0.8)] scale-110{% else %}text-[#a3aac4]{% endif %}" href="{{ url_for('dashboard.analytics') }}">
+            <span class="material-symbols-outlined">insights</span>
+            <span class="font-['Inter'] text-[10px] font-bold tracking-[0.1em] uppercase mt-1">Stats</span>
+        </a>
+        <a class="flex flex-col items-center justify-center {% if request.endpoint == 'dashboard.settings' %}text-[#cc97ff] drop-shadow-[0_0_5px_rgba(204,151,255,0.8)] scale-110{% else %}text-[#a3aac4]{% endif %}" href="{{ url_for('dashboard.settings') }}">
+            <span class="material-symbols-outlined">tune</span>
+            <span class="font-['Inter'] text-[10px] font-bold tracking-[0.1em] uppercase mt-1">Settings</span>
+        </a>
+        <a class="flex flex-col items-center justify-center text-[#a3aac4] hover:text-error transition-all" href="{{ url_for('auth.logout') }}">
+            <span class="material-symbols-outlined">power_settings_new</span>
+            <span class="font-['Inter'] text-[10px] font-bold tracking-[0.1em] uppercase mt-1">Exit</span>
+        </a>
+    </nav>
+    {% endif %}
+
+    {% block scripts %}{% endblock %}
+</body>
+</html>

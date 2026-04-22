@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block title %}SENTINALL // Authentication Protocol{% endblock %}
+
+{% block content %}
+<div class="w-full max-w-lg z-10 mx-auto">
+    <!-- Alert States -->
+    {% if error %}
+    <div class="mb-8 p-4 rounded-xl bg-error-container/20 border border-error/30 text-error flex items-center gap-4">
+        <span class="material-symbols-outlined">warning</span>
+        <span class="text-sm font-medium tracking-wide">AUTHENTICATION_FAILURE: {{ error }}</span>
+    </div>
+    {% endif %}
+
+    {% if success %}
+    <div class="mb-8 p-4 rounded-xl bg-secondary/10 border border-secondary/30 text-secondary flex items-center gap-4">
+        <span class="material-symbols-outlined">check_circle</span>
+        <span class="text-sm font-medium tracking-wide">SUCCESS: {{ success }}</span>
+    </div>
+    {% endif %}
+
+    <!-- Auth Container -->
+    <div class="glass-panel rounded-2xl border border-outline-variant/20 shadow-2xl overflow-hidden">
+        <div class="flex border-b border-outline-variant/10">
+            <a href="{{ url_for('auth.login') }}" class="flex-1 py-5 text-sm font-black tracking-[0.2em] uppercase text-center {% if request.endpoint == 'auth.login' %}text-primary border-b-2 border-primary bg-primary/5{% else %}text-on-surface-variant hover:text-on-surface hover:bg-surface-bright/30{% endif %} transition-all">
+                LOGIN
+            </a>
+            <a href="{{ url_for('auth.register') }}" class="flex-1 py-5 text-sm font-black tracking-[0.2em] uppercase text-center {% if request.endpoint == 'auth.register' %}text-primary border-b-2 border-primary bg-primary/5{% else %}text-on-surface-variant hover:text-on-surface hover:bg-surface-bright/30{% endif %} transition-all">
+                REGISTER
+            </a>
+        </div>
+        
+        <div class="p-8 md:p-12">
+            <form action="{{ url_for('auth.login') }}" method="POST" class="space-y-8">
+                <div class="space-y-6">
+                    <div class="group">
+                        <label class="block text-[10px] font-bold tracking-[0.2em] uppercase text-on-surface-variant mb-2 ml-1">Identity_Handle</label>
+                        <div class="relative flex items-center rounded-xl border border-outline-variant/30 bg-surface-container-low transition-all focus-within:border-primary focus-within:shadow-[0_0_15px_rgba(204,151,255,0.3)]">
+                            <span class="material-symbols-outlined ml-4 text-on-surface-variant opacity-50">person</span>
+                            <input name="username" class="w-full bg-transparent border-none focus:ring-0 py-4 px-4 text-on-surface placeholder:text-outline/50 font-medium" placeholder="username" type="text" required/>
+                        </div>
+                    </div>
+                    <div class="group">
+                        <label class="block text-[10px] font-bold tracking-[0.2em] uppercase text-on-surface-variant mb-2 ml-1">Access_Cipher</label>
+                        <div class="relative flex items-center rounded-xl border border-outline-variant/30 bg-surface-container-low transition-all focus-within:border-primary focus-within:shadow-[0_0_15px_rgba(204,151,255,0.3)]">
+                            <span class="material-symbols-outlined ml-4 text-on-surface-variant opacity-50">lock</span>
+                            <input name="password" class="w-full bg-transparent border-none focus:ring-0 py-4 px-4 text-on-surface placeholder:text-outline/50 font-medium" placeholder="••••••••" type="password" required/>
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <label class="flex items-center gap-3 cursor-pointer group">
+                            <div class="relative">
+                                <input name="remember_me" value="yes" class="peer sr-only" type="checkbox"/>
+                                <div class="w-5 h-5 border-2 border-outline-variant/50 rounded bg-transparent peer-checked:bg-secondary peer-checked:border-secondary transition-all"></div>
+                                <span class="material-symbols-outlined absolute top-0 left-0 text-[16px] text-surface font-bold opacity-0 peer-checked:opacity-100 transition-opacity">check</span>
+                            </div>
+                            <span class="text-xs font-bold tracking-widest uppercase text-on-surface-variant group-hover:text-on-surface transition-colors">PERSIST_SESSION</span>
+                        </label>
+                    </div>
+                </div>
+                <button class="w-full py-4 bg-gradient-to-r from-primary-dim to-primary rounded-xl font-black text-on-primary tracking-[0.3em] uppercase shadow-[0_0_20px_rgba(156,72,234,0.3)] hover:shadow-[0_0_30px_rgba(156,72,234,0.5)] active:scale-95 transition-all" type="submit">
+                    INITIALIZE_PROTOCOL
+                </button>
+            </form>
+        </div>
+        
+        <!-- Decorative Pattern Bar -->
+        <div class="h-1 w-full flex">
+            <div class="h-full w-1/3 bg-primary"></div>
+            <div class="h-full w-1/3 bg-secondary"></div>
+            <div class="h-full w-1/3 bg-tertiary"></div>
+        </div>
+    </div>
+    
+    <div class="mt-8 text-center">
+        <p class="text-[10px] font-bold tracking-[0.2em] uppercase text-on-surface-variant">
+            AUTHORIZED_ACCESS_ONLY // ALL_LOGS_PERMANENTLY_ARCHIVED
+        </p>
+    </div>
+</div>
+{% endblock %}

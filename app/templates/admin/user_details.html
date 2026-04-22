@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+
+{% block title %}SENTINALL // Node Inspection: {{ user.username }}{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    <div class="mb-12 flex items-center justify-between">
+        <div class="flex items-center gap-6">
+            <a href="{{ url_for('admin.index') }}" class="w-10 h-10 rounded-full bg-surface-container border border-outline-variant/30 flex items-center justify-center text-on-surface-variant hover:text-primary transition-all">
+                <span class="material-symbols-outlined">arrow_back</span>
+            </a>
+            <div>
+                <h2 class="text-3xl font-black tracking-tighter text-on-surface uppercase">{{ user.username }}</h2>
+                <p class="text-[10px] font-mono text-on-surface-variant uppercase tracking-widest mt-1">NODE_ID: {{ user._id }}</p>
+            </div>
+        </div>
+        
+        <div class="flex gap-4">
+            <button onclick="deleteUser('{{ user.username }}')" class="px-6 py-3 bg-error/10 border border-error/20 rounded-xl text-error text-[10px] font-black tracking-widest uppercase hover:bg-error/20 transition-all">
+                PURGE_NODE
+            </button>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+        <div class="surface-container p-6 rounded-2xl border border-outline-variant/10 text-center">
+            <p class="text-[10px] font-black tracking-widest text-primary uppercase mb-1">Total Links</p>
+            <p class="text-3xl font-black text-on-surface">{{ stats.total_links }}</p>
+        </div>
+        <div class="surface-container p-6 rounded-2xl border border-outline-variant/10 text-center">
+            <p class="text-[10px] font-black tracking-widest text-secondary uppercase mb-1">Active</p>
+            <p class="text-3xl font-black text-on-surface">{{ stats.active_links }}</p>
+        </div>
+        <div class="surface-container p-6 rounded-2xl border border-outline-variant/10 text-center">
+            <p class="text-[10px] font-black tracking-widest text-error uppercase mb-1">Bypassed</p>
+            <p class="text-3xl font-black text-on-surface">{{ stats.bypassed_links }}</p>
+        </div>
+    </div>
+
+    <div class="glass-panel p-8 rounded-2xl border border-outline-variant/10 shadow-xl mb-12">
+        <h3 class="text-xs font-black tracking-[0.3em] text-primary uppercase mb-8">Node Configuration</h3>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-8">
+            <div class="space-y-4">
+                <div>
+                    <p class="text-[10px] font-black tracking-widest text-on-surface-variant uppercase mb-1">Shortener Domain</p>
+                    <p class="text-sm font-mono text-on-surface">{{ user.shortener_domain or 'NOT_SET' }}</p>
+                </div>
+                <div>
+                    <p class="text-[10px] font-black tracking-widest text-on-surface-variant uppercase mb-1">Created At</p>
+                    <p class="text-sm font-mono text-on-surface">{{ user.created_at.strftime('%Y-%m-%d %H:%M') if user.created_at else 'UNKNOWN' }}</p>
+                </div>
+            </div>
+            <div class="space-y-4">
+                <div>
+                    <p class="text-[10px] font-black tracking-widest text-on-surface-variant uppercase mb-1">API Key</p>
+                    <div class="flex items-center gap-2">
+                        <p class="text-xs font-mono text-secondary">{{ user.api_key }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    async function deleteUser(username) {
+        if (!confirm(`CRITICAL: Permanently delete ${username} and ALL associated links? This action is irreversible.`)) return;
+        
+        try {
+            const res = await fetch(`/admin/user/${username}/delete`, { method: 'POST' });
+            const data = await res.json();
+            if (data.status === 'success') {
+                alert('Node successfully purged');
+                window.location.href = '{{ url_for("admin.index") }}';
+            } else {
+                alert('Error: ' + data.message);
+            }
+        } catch (err) {
+            alert('Purge command failed');
+        }
+    }
+</script>
+{% endblock %}
