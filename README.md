@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="app/static/img/logo.png" width="150" alt="SENTINALL Logo">
+</p>
+
 # 🛡️ SENTINALL // Link Guard Logic
 
 SENTINALL is a professional-grade link protection and redirection framework. It is engineered to secure digital distribution channels against unauthorized bypass scripts, automated scrapers, and ad-blockers.
@@ -141,7 +145,7 @@ If you find a bug:
 ## 📢 Community & Support
 
 Stay updated with the latest guard logic updates and community nodes:
-*   **Telegram**: [t.me/canon_bots](https://t.me/canon_bots)
+*   **Telegram**: [t.me/sentinall_bots](https://t.me/canon_bots)
 
 ---
 

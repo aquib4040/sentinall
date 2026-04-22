@@ -15,10 +15,12 @@
         </div>
 
         <form id="startCaptchaForm" class="flex flex-col items-center">
-            <div class="g-recaptcha mb-8" data-sitekey="{{ site_key }}" data-theme="dark" data-callback="onCaptchaVerified"></div>
-            
-            <button id="submitBtn" disabled class="w-full bg-gradient-to-br from-primary-dim to-primary text-on-primary-container font-black py-4 px-6 rounded-md uppercase tracking-widest text-sm shadow-[0_0_25px_rgba(157,78,221,0.4)] disabled:opacity-30 disabled:cursor-not-allowed transition-all hover:brightness-110">
-                PROCEED_TO_CANON
+            <div class="g-recaptcha mb-8" data-sitekey="{{ site_key }}" data-theme="dark"
+                data-callback="onCaptchaVerified"></div>
+
+            <button id="submitBtn" disabled
+                class="w-full bg-gradient-to-br from-primary-dim to-primary text-on-primary-container font-black py-4 px-6 rounded-md uppercase tracking-widest text-sm shadow-[0_0_25px_rgba(157,78,221,0.4)] disabled:opacity-30 disabled:cursor-not-allowed transition-all hover:brightness-110">
+                PROCEED_TO_SENTINALL
             </button>
         </form>
     </div>
@@ -51,7 +53,7 @@
                     recaptcha: captchaResponse
                 })
             });
-            
+
             const data = await res.json();
             if (data.status === 'success') {
                 window.location.href = data.redirect_url;
@@ -59,7 +61,7 @@
                 alert('Error: ' + data.message);
                 grecaptcha.reset();
                 submitBtn.disabled = false;
-                submitBtn.innerText = 'PROCEED_TO_CANON';
+                submitBtn.innerText = 'PROCEED_TO_SENTINALL';
             }
         } catch (err) {
             alert('Failed to connect to server');
