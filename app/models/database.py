@@ -21,7 +21,7 @@ class Database:
             
             # Create indexes
             self.links.create_index([("encrypted_token", ASCENDING)], unique=True)
-            self.links.create_index([("verify_token", ASCENDING)], unique=True)
+            self.links.create_index([("verify_token", ASCENDING)], unique=True, sparse=True)
             self.links.create_index([("username", ASCENDING)])
             self.links.create_index([("status", ASCENDING)])
             self.links.create_index([("created_at", ASCENDING)])
