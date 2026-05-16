@@ -41,10 +41,7 @@ def settings():
                 'settings': {
                     'verification_time_seconds': int(request.form.get('verification_time_seconds', 0) or 0),
                     'auto_disable_hours': int(request.form.get('auto_disable_hours', 0) or 0),
-                    'check_fingerprint': request.form.get('check_fingerprint') == 'on',
-                    'check_cookies': request.form.get('check_cookies') == 'on',
                     'auto_delete_disabled': request.form.get('auto_delete_disabled') == 'on',
-                    'disable_link_after_use': request.form.get('disable_link_after_use') == 'on',
                     'recaptcha_on_start': request.form.get('recaptcha_on_start') == 'on',
                     'recaptcha_on_verify': request.form.get('recaptcha_on_verify') == 'on',
                     'enable_verification_time_check': request.form.get('enable_verification_time_check') == 'on',
@@ -72,9 +69,10 @@ def settings():
                 success='Settings updated successfully!')
             
         except Exception as e:
+            current_app.logger.error(f"Settings update error for {username}: {e}")
             return render_template('dashboard/settings.html', 
                 user=user,
-                error=f'Update failed: {str(e)}')
+                error='Settings update failed. Please try again.')
     
     return render_template('dashboard/settings.html', user=user)
 

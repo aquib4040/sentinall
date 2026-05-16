@@ -2,7 +2,7 @@
 <html class="dark" lang="en">
 <head>
     <meta charset="utf-8"/>
-    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
     <title>{% block title %}SENTINALL{% endblock %}</title>
     <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/logo.png') }}"/>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
@@ -21,10 +21,20 @@
                         "tertiary": "#ff86c3",
                         "error": "#ff6e84",
                         "surface-container": "#0f1930",
+                        "surface-container-low": "#091328",
                         "surface-container-high": "#141f38",
                         "surface-container-highest": "#192540",
+                        "surface-bright": "#1f2b49",
                         "outline-variant": "#40485d",
-                        "on-surface-variant": "#a3aac4"
+                        "on-surface-variant": "#a3aac4",
+                        "primary-dim": "#9c48ea",
+                        "on-primary": "#47007c",
+                        "on-primary-container": "#360061",
+                        "secondary-dim": "#1ad0eb",
+                        "on-secondary-container": "#eafbff",
+                        "error-dim": "#d73357",
+                        "on-error": "#490013",
+                        "outline": "#6d758c"
                     },
                     "borderRadius": {
                         "DEFAULT": "0.125rem",
@@ -59,17 +69,52 @@
         body {
             min-height: 100dvh;
         }
+        /* Mobile drawer overlay */
+        .drawer-overlay {
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        .drawer-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .drawer-panel {
+            transform: translateX(-100%);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .drawer-panel.active {
+            transform: translateX(0);
+        }
+        /* Toast notification */
+        .toast {
+            animation: toast-in 0.3s ease, toast-out 0.3s ease 2s forwards;
+        }
+        @keyframes toast-in {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        @keyframes toast-out {
+            from { opacity: 1; }
+            to { opacity: 0; }
+        }
     </style>
     {% block head %}{% endblock %}
 </head>
 <body class="bg-background text-on-surface font-body selection:bg-primary selection:text-on-primary">
     
     {% if session.get('logged_in') or session.get('owner_logged_in') %}
-    <!-- Navigation Drawer -->
-    <aside class="fixed inset-y-0 left-0 z-[60] flex flex-col bg-[#091328] border-r border-[#40485d]/20 h-full w-72 hidden md:flex">
+    <!-- Mobile Drawer Overlay -->
+    <div id="drawerOverlay" class="drawer-overlay fixed inset-0 z-[55] bg-black/60 backdrop-blur-sm md:hidden" onclick="closeDrawer()"></div>
+
+    <!-- Navigation Drawer (Desktop: always visible, Mobile: slide-in) -->
+    <aside id="drawerPanel" class="drawer-panel fixed inset-y-0 left-0 z-[60] flex flex-col bg-[#091328] border-r border-[#40485d]/20 h-full w-72 md:!transform-none md:flex">
         <div class="p-8 flex flex-col h-full">
-            <div class="mb-12">
+            <div class="mb-12 flex items-center justify-between">
                 <span class="text-xl font-bold text-[#dee5ff] tracking-tight">SENTINALL</span>
+                <button class="md:hidden text-on-surface-variant hover:text-primary transition-colors" onclick="closeDrawer()">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
             </div>
             
             <div class="flex items-center gap-4 mb-10 p-4 bg-surface-container/40 rounded-xl">
@@ -122,7 +167,7 @@
     <!-- Top AppBar -->
     <header class="fixed top-0 right-0 left-0 md:left-72 z-50 bg-[#060e20]/60 backdrop-blur-xl flex justify-between items-center px-6 h-16 shadow-[0_0_15px_rgba(204,151,255,0.08)]">
         <div class="flex items-center gap-4">
-            <button class="md:hidden text-[#9D4EDD]">
+            <button id="menuBtn" class="md:hidden text-[#9D4EDD] hover:text-primary transition-colors" onclick="openDrawer()">
                 <span class="material-symbols-outlined">menu</span>
             </button>
             <h1 class="text-2xl font-black tracking-tighter text-[#dee5ff] drop-shadow-[0_0_8px_rgba(157,78,221,0.5)] font-['Inter'] uppercase">SENTINALL</h1>
@@ -139,8 +184,10 @@
     <!-- Background grid texture -->
     <div class="fixed inset-0 sentinall-grid pointer-events-none opacity-30 z-0"></div>
 
-    <main class="relative z-10 {% if session.get('logged_in') or session.get('owner_logged_in') %}md:ml-72 pt-24{% else %}flex items-center justify-center min-h-screen{% endif %} pb-20 px-4 sm:px-8 max-w-7xl mx-auto w-full">
-        {% block content %}{% endblock %}
+    <main class="relative z-10 {% if session.get('logged_in') or session.get('owner_logged_in') %}md:ml-72 pt-24 pb-28 md:pb-20{% else %}flex items-center justify-center min-h-screen{% endif %} px-4 sm:px-8">
+        <div class="{% if session.get('logged_in') or session.get('owner_logged_in') %}max-w-7xl w-full{% endif %}">
+            {% block content %}{% endblock %}
+        </div>
     </main>
 
     {% if session.get('logged_in') and not session.get('owner_logged_in') %}
@@ -164,6 +211,38 @@
         </a>
     </nav>
     {% endif %}
+
+    <!-- Toast container -->
+    <div id="toastContainer" class="fixed bottom-24 md:bottom-8 left-1/2 -translate-x-1/2 z-[100] flex flex-col items-center gap-2"></div>
+
+    <script>
+        // Mobile drawer toggle
+        function openDrawer() {
+            document.getElementById('drawerOverlay')?.classList.add('active');
+            document.getElementById('drawerPanel')?.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+        function closeDrawer() {
+            document.getElementById('drawerOverlay')?.classList.remove('active');
+            document.getElementById('drawerPanel')?.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+        // Global toast function
+        window.showToast = function(message, type = 'success') {
+            const container = document.getElementById('toastContainer');
+            if (!container) return;
+            const colors = {
+                success: 'bg-secondary/20 border-secondary/40 text-secondary',
+                error: 'bg-error/20 border-error/40 text-error',
+                info: 'bg-primary/20 border-primary/40 text-primary'
+            };
+            const toast = document.createElement('div');
+            toast.className = `toast px-6 py-3 rounded-xl border backdrop-blur-xl text-sm font-bold tracking-wide ${colors[type] || colors.info}`;
+            toast.textContent = message;
+            container.appendChild(toast);
+            setTimeout(() => toast.remove(), 2500);
+        };
+    </script>
 
     {% block scripts %}{% endblock %}
 </body>

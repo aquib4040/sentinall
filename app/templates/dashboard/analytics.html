@@ -4,8 +4,8 @@
 
 {% block content %}
 <div class="max-w-6xl mx-auto">
-    <div class="flex items-center justify-between mb-12">
-        <h2 class="text-3xl font-black tracking-tighter text-[#dee5ff] uppercase">LINK_INTELLIGENCE</h2>
+    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-12 gap-4">
+        <h2 class="text-2xl sm:text-3xl font-black tracking-tighter text-[#dee5ff] uppercase">LINK_INTELLIGENCE</h2>
         <div class="flex items-center gap-4">
             <select id="monthSelector" class="bg-surface-container border border-outline-variant/30 text-on-surface text-xs font-bold tracking-widest uppercase py-2 px-4 rounded-xl focus:ring-secondary focus:border-secondary transition-all">
                 <option value="{{ current_month }}">Loading months...</option>
@@ -14,7 +14,7 @@
     </div>
 
     <!-- Live Stats Summary -->
-    <div id="summaryStats" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-12">
+    <div id="summaryStats" class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-12">
         <div class="animate-pulse bg-surface-container/50 h-32 rounded-2xl"></div>
         <div class="animate-pulse bg-surface-container/50 h-32 rounded-2xl"></div>
         <div class="animate-pulse bg-surface-container/50 h-32 rounded-2xl"></div>
@@ -24,24 +24,24 @@
     <!-- Reports Section -->
     <div class="space-y-8">
         <!-- Tabs -->
-        <div class="flex gap-2 p-1 bg-surface-container/30 rounded-2xl border border-outline-variant/10 w-fit">
-            <button onclick="switchTab('daily')" class="tab-btn px-6 py-3 text-[10px] font-black tracking-[0.2em] uppercase rounded-xl transition-all active-tab" id="dailyBtn">DAILY_REPORT</button>
-            <button onclick="switchTab('monthly')" class="tab-btn px-6 py-3 text-[10px] font-black tracking-[0.2em] uppercase rounded-xl transition-all text-on-surface-variant hover:text-on-surface" id="monthlyBtn">MONTHLY_REPORT</button>
-            <button onclick="switchTab('lifetime')" class="tab-btn px-6 py-3 text-[10px] font-black tracking-[0.2em] uppercase rounded-xl transition-all text-on-surface-variant hover:text-on-surface" id="lifetimeBtn">LIFETIME_STATS</button>
+        <div class="flex gap-2 p-1 bg-surface-container/30 rounded-2xl border border-outline-variant/10 w-fit overflow-x-auto">
+            <button onclick="switchTab('daily')" class="tab-btn px-4 sm:px-6 py-3 text-[10px] font-black tracking-[0.15em] sm:tracking-[0.2em] uppercase rounded-xl transition-all active-tab whitespace-nowrap" id="dailyBtn">DAILY</button>
+            <button onclick="switchTab('monthly')" class="tab-btn px-4 sm:px-6 py-3 text-[10px] font-black tracking-[0.15em] sm:tracking-[0.2em] uppercase rounded-xl transition-all text-on-surface-variant hover:text-on-surface whitespace-nowrap" id="monthlyBtn">MONTHLY</button>
+            <button onclick="switchTab('lifetime')" class="tab-btn px-4 sm:px-6 py-3 text-[10px] font-black tracking-[0.15em] sm:tracking-[0.2em] uppercase rounded-xl transition-all text-on-surface-variant hover:text-on-surface whitespace-nowrap" id="lifetimeBtn">LIFETIME</button>
         </div>
 
         <!-- Table Container -->
         <div class="glass-panel rounded-2xl border border-outline-variant/10 shadow-2xl overflow-hidden">
             <!-- Daily Content -->
-            <div id="daily" class="tab-content">
-                <table class="w-full text-left">
+            <div id="daily" class="tab-content overflow-x-auto">
+                <table class="w-full text-left min-w-[500px]">
                     <thead class="bg-surface-container-high/50">
                         <tr>
-                            <th class="px-8 py-4 text-[10px] font-black tracking-[0.2em] text-on-surface-variant uppercase">Temporal_Node</th>
-                            <th class="px-8 py-4 text-[10px] font-black tracking-[0.2em] text-primary uppercase">Created</th>
-                            <th class="px-8 py-4 text-[10px] font-black tracking-[0.2em] text-secondary uppercase">Completed</th>
-                            <th class="px-8 py-4 text-[10px] font-black tracking-[0.2em] text-error uppercase">Bypassed</th>
-                            <th class="px-8 py-4 text-[10px] font-black tracking-[0.2em] text-on-surface uppercase">Active</th>
+                            <th class="px-4 sm:px-8 py-4 text-[10px] font-black tracking-[0.2em] text-on-surface-variant uppercase">Date</th>
+                            <th class="px-4 sm:px-8 py-4 text-[10px] font-black tracking-[0.2em] text-primary uppercase">Created</th>
+                            <th class="px-4 sm:px-8 py-4 text-[10px] font-black tracking-[0.2em] text-secondary uppercase">Completed</th>
+                            <th class="px-4 sm:px-8 py-4 text-[10px] font-black tracking-[0.2em] text-error uppercase">Bypassed</th>
+                            <th class="px-4 sm:px-8 py-4 text-[10px] font-black tracking-[0.2em] text-on-surface uppercase">Active</th>
                         </tr>
                     </thead>
                     <tbody id="dailyTable" class="divide-y divide-outline-variant/10">
@@ -51,15 +51,15 @@
             </div>
 
             <!-- Monthly Content -->
-            <div id="monthly" class="tab-content hidden">
-                <table class="w-full text-left">
+            <div id="monthly" class="tab-content hidden overflow-x-auto">
+                <table class="w-full text-left min-w-[500px]">
                     <thead class="bg-surface-container-high/50">
                         <tr>
-                            <th class="px-8 py-4 text-[10px] font-black tracking-[0.2em] text-on-surface-variant uppercase">Cycle_Node</th>
-                            <th class="px-8 py-4 text-[10px] font-black tracking-[0.2em] text-primary uppercase">Created</th>
-                            <th class="px-8 py-4 text-[10px] font-black tracking-[0.2em] text-secondary uppercase">Completed</th>
-                            <th class="px-8 py-4 text-[10px] font-black tracking-[0.2em] text-error uppercase">Bypassed</th>
-                            <th class="px-8 py-4 text-[10px] font-black tracking-[0.2em] text-on-surface uppercase">Active</th>
+                            <th class="px-4 sm:px-8 py-4 text-[10px] font-black tracking-[0.2em] text-on-surface-variant uppercase">Month</th>
+                            <th class="px-4 sm:px-8 py-4 text-[10px] font-black tracking-[0.2em] text-primary uppercase">Created</th>
+                            <th class="px-4 sm:px-8 py-4 text-[10px] font-black tracking-[0.2em] text-secondary uppercase">Completed</th>
+                            <th class="px-4 sm:px-8 py-4 text-[10px] font-black tracking-[0.2em] text-error uppercase">Bypassed</th>
+                            <th class="px-4 sm:px-8 py-4 text-[10px] font-black tracking-[0.2em] text-on-surface uppercase">Active</th>
                         </tr>
                     </thead>
                     <tbody id="monthlyTable" class="divide-y divide-outline-variant/10">
@@ -70,7 +70,7 @@
 
             <!-- Lifetime Content -->
             <div id="lifetime" class="tab-content hidden p-8">
-                <div id="lifetimeData" class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div id="lifetimeData" class="grid grid-cols-2 md:grid-cols-2 gap-4 sm:gap-8">
                     <!-- Content via JS -->
                 </div>
             </div>
@@ -107,18 +107,18 @@
 
     function renderSummary() {
         const createCard = (label, value, sub, color) => `
-            <div class="surface-container border border-outline-variant/10 p-6 rounded-2xl hover:bg-surface-bright transition-all group">
-                <p class="text-[10px] font-black tracking-[0.2em] text-on-surface-variant uppercase mb-4">${label}</p>
-                <h3 class="text-4xl font-display font-black text-${color}">${value}</h3>
-                <p class="mt-4 text-[10px] text-on-surface-variant leading-relaxed">${sub}</p>
+            <div class="bg-surface-container border border-outline-variant/10 p-4 sm:p-6 rounded-2xl hover:bg-surface-bright transition-all group">
+                <p class="text-[10px] font-black tracking-[0.15em] sm:tracking-[0.2em] text-on-surface-variant uppercase mb-3 sm:mb-4">${label}</p>
+                <h3 class="text-2xl sm:text-4xl font-display font-black text-${color}">${value}</h3>
+                <p class="mt-3 sm:mt-4 text-[10px] text-on-surface-variant leading-relaxed">${sub}</p>
             </div>
         `;
 
         document.getElementById('summaryStats').innerHTML = `
-            ${createCard('Today_Load', summaryData.daily.total_created, `COMPL: ${summaryData.daily.total_completed} // BYPASS: ${summaryData.daily.total_bypassed}`, 'primary')}
-            ${createCard('Monthly_Load', summaryData.monthly.total_created, `COMPL: ${summaryData.monthly.total_completed} // BYPASS: ${summaryData.monthly.total_bypassed}`, 'secondary')}
-            ${createCard('Lifetime_Archive', summaryData.lifetime.total_created, `COMPL: ${summaryData.lifetime.total_completed} // BYPASS: ${summaryData.lifetime.total_bypassed}`, 'on-surface')}
-            ${createCard('Active_Nodes', summaryData.lifetime.total_active, `Currently propagating across network`, 'tertiary')}
+            ${createCard('Today', summaryData.daily.total_created, `Done: ${summaryData.daily.total_completed} / Bypass: ${summaryData.daily.total_bypassed}`, 'primary')}
+            ${createCard('Monthly', summaryData.monthly.total_created, `Done: ${summaryData.monthly.total_completed} / Bypass: ${summaryData.monthly.total_bypassed}`, 'secondary')}
+            ${createCard('Lifetime', summaryData.lifetime.total_created, `Done: ${summaryData.lifetime.total_completed} / Bypass: ${summaryData.lifetime.total_bypassed}`, 'on-surface')}
+            ${createCard('Active', summaryData.lifetime.total_active, `Currently propagating`, 'tertiary')}
         `;
     }
 
@@ -164,24 +164,24 @@
     function renderDailyTable(data) {
         const html = data.map(d => `
             <tr class="hover:bg-surface-bright/20 transition-colors">
-                <td class="px-8 py-5 text-sm font-bold text-on-surface">${d.date}</td>
-                <td class="px-8 py-5 text-sm font-mono text-primary">${d.created}</td>
-                <td class="px-8 py-5 text-sm font-mono text-secondary">${d.completed}</td>
-                <td class="px-8 py-5 text-sm font-mono text-error">${d.bypassed}</td>
-                <td class="px-8 py-5 text-sm font-mono text-on-surface">${d.active}</td>
+                <td class="px-4 sm:px-8 py-4 sm:py-5 text-sm font-bold text-on-surface">${d.date}</td>
+                <td class="px-4 sm:px-8 py-4 sm:py-5 text-sm font-mono text-primary">${d.created}</td>
+                <td class="px-4 sm:px-8 py-4 sm:py-5 text-sm font-mono text-secondary">${d.completed}</td>
+                <td class="px-4 sm:px-8 py-4 sm:py-5 text-sm font-mono text-error">${d.bypassed}</td>
+                <td class="px-4 sm:px-8 py-4 sm:py-5 text-sm font-mono text-on-surface">${d.active}</td>
             </tr>
         `).join('');
-        document.getElementById('dailyTable').innerHTML = html || '<tr><td colspan="5" class="p-8 text-center text-xs text-on-surface-variant">NO_DATA_ARCHIVED_FOR_PERIOD</td></tr>';
+        document.getElementById('dailyTable').innerHTML = html || '<tr><td colspan="5" class="p-8 text-center text-xs text-on-surface-variant">NO_DATA_FOR_PERIOD</td></tr>';
     }
 
     function renderMonthlyTable(data) {
         const html = data.map(m => `
             <tr class="hover:bg-surface-bright/20 transition-colors">
-                <td class="px-8 py-5 text-sm font-bold text-on-surface">${m.display}</td>
-                <td class="px-8 py-5 text-sm font-mono text-primary">${m.created}</td>
-                <td class="px-8 py-5 text-sm font-mono text-secondary">${m.completed}</td>
-                <td class="px-8 py-5 text-sm font-mono text-error">${m.bypassed}</td>
-                <td class="px-8 py-5 text-sm font-mono text-on-surface">${m.active}</td>
+                <td class="px-4 sm:px-8 py-4 sm:py-5 text-sm font-bold text-on-surface">${m.display}</td>
+                <td class="px-4 sm:px-8 py-4 sm:py-5 text-sm font-mono text-primary">${m.created}</td>
+                <td class="px-4 sm:px-8 py-4 sm:py-5 text-sm font-mono text-secondary">${m.completed}</td>
+                <td class="px-4 sm:px-8 py-4 sm:py-5 text-sm font-mono text-error">${m.bypassed}</td>
+                <td class="px-4 sm:px-8 py-4 sm:py-5 text-sm font-mono text-on-surface">${m.active}</td>
             </tr>
         `).join('');
         document.getElementById('monthlyTable').innerHTML = html;
@@ -190,19 +190,19 @@
     function renderLifetimeStats() {
         const lifetime = summaryData.lifetime;
         document.getElementById('lifetimeData').innerHTML = `
-            <div class="p-6 rounded-xl bg-surface-container/50 border border-outline-variant/10">
+            <div class="p-4 sm:p-6 rounded-xl bg-surface-container/50 border border-outline-variant/10">
                 <p class="text-[10px] font-black tracking-[0.2em] text-on-surface-variant uppercase mb-2">Total_Archives</p>
                 <h4 class="text-2xl font-black text-on-surface">${lifetime.total_created}</h4>
             </div>
-            <div class="p-6 rounded-xl bg-surface-container/50 border border-outline-variant/10">
+            <div class="p-4 sm:p-6 rounded-xl bg-surface-container/50 border border-outline-variant/10">
                 <p class="text-[10px] font-black tracking-[0.2em] text-secondary uppercase mb-2">Verification_Success</p>
                 <h4 class="text-2xl font-black text-secondary">${lifetime.total_completed}</h4>
             </div>
-            <div class="p-6 rounded-xl bg-surface-container/50 border border-outline-variant/10">
+            <div class="p-4 sm:p-6 rounded-xl bg-surface-container/50 border border-outline-variant/10">
                 <p class="text-[10px] font-black tracking-[0.2em] text-error uppercase mb-2">Bypass_Detected</p>
                 <h4 class="text-2xl font-black text-error">${lifetime.total_bypassed}</h4>
             </div>
-            <div class="p-6 rounded-xl bg-surface-container/50 border border-outline-variant/10">
+            <div class="p-4 sm:p-6 rounded-xl bg-surface-container/50 border border-outline-variant/10">
                 <p class="text-[10px] font-black tracking-[0.2em] text-tertiary uppercase mb-2">Propagation_Status</p>
                 <h4 class="text-2xl font-black text-tertiary">STABLE</h4>
             </div>

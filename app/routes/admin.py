@@ -25,8 +25,9 @@ def index():
             users=all_users,
             stats=total_stats)
     except Exception as e:
+        current_app.logger.error(f"Admin dashboard error: {e}")
         return render_template('admin/index.html',
-            error=f'Error loading dashboard: {str(e)}',
+            error='Error loading dashboard',
             users=[],
             stats={'total_users': 0, 'active_users': 0, 'total_links': 0, 'total_earnings': 0})
 
@@ -51,9 +52,8 @@ def user_details(username):
             user_links=user_links,
             app_url=request.url_root.rstrip('/'))
     except Exception as e:
-        return render_template('errors/500.html',
-            error_title='Error',
-            error_message=f'Error loading user details: {str(e)}')
+        current_app.logger.error(f"User details error for {username}: {e}")
+        return render_template('errors/500.html'), 500
 
 @admin_bp.route('/owner/user/<username>/disable', methods=['POST'])
 @owner_required
@@ -73,7 +73,8 @@ def disable_user_route(username):
             'new_status': target_status
         })
     except Exception as e:
-        return jsonify({'status': 'error', 'message': str(e)})
+        current_app.logger.error(f"Disable user error for {username}: {e}")
+        return jsonify({'status': 'error', 'message': 'Operation failed'}), 500
 
 @admin_bp.route('/owner/user/<username>/delete', methods=['POST'])
 @owner_required
@@ -82,4 +83,5 @@ def delete_user_route(username):
         delete_user(username)
         return jsonify({'status': 'success', 'message': f'User {username} and all associated links have been deleted'})
     except Exception as e:
-        return jsonify({'status': 'error', 'message': str(e)})
+        current_app.logger.error(f"Delete user error for {username}: {e}")
+        return jsonify({'status': 'error', 'message': 'Deletion failed'}), 500

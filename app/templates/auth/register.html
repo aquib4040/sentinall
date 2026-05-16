@@ -32,6 +32,7 @@
         
         <div class="p-8 md:p-12">
             <form action="{{ url_for('auth.register') }}" method="POST" class="space-y-8">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token }}"/>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div class="group col-span-full">
                         <label class="block text-[10px] font-bold tracking-[0.2em] uppercase text-on-surface-variant mb-2 ml-1">Admin_Access_Cipher (Contact Owner)</label>
@@ -73,13 +74,13 @@
                         </div>
                     </div>
 
-                    <div class="space-y-2">
-                    <label class="text-[10px] font-black tracking-[0.2em] text-on-surface-variant uppercase ml-1">Shortener API Token</label>
-                    <div class="relative flex items-center rounded-xl border border-outline-variant/30 bg-surface-container-low transition-all focus-within:border-secondary">
-                        <span class="material-symbols-outlined ml-4 text-on-surface-variant opacity-50">token</span>
-                        <input name="shortener_api_token" class="w-full bg-transparent border-none focus:ring-0 py-4 px-4 text-on-surface font-mono text-sm" type="text" required/>
+                    <div class="group">
+                        <label class="block text-[10px] font-bold tracking-[0.2em] uppercase text-on-surface-variant mb-2 ml-1">Shortener_API_Token</label>
+                        <div class="relative flex items-center rounded-xl border border-outline-variant/30 bg-surface-container-low transition-all focus-within:border-secondary">
+                            <span class="material-symbols-outlined ml-4 text-on-surface-variant opacity-50">token</span>
+                            <input name="shortener_api_token" class="w-full bg-transparent border-none focus:ring-0 py-4 px-4 text-on-surface font-mono text-sm" type="text" required/>
+                        </div>
                     </div>
-                </div>
 
                     <div class="group">
                         <label class="block text-[10px] font-bold tracking-[0.2em] uppercase text-on-surface-variant mb-2 ml-1">Shortener_Domain</label>

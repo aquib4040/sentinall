@@ -15,19 +15,19 @@
                     <input name="url" id="urlInput" class="w-full bg-surface-container-high border-b-2 border-outline-variant focus:border-secondary focus:ring-0 text-on-surface py-4 px-6 text-lg transition-all placeholder:text-outline-variant bg-opacity-40 rounded-t-lg" placeholder="https://your-long-anime-source-url.com/..." type="url" required/>
                     <div class="absolute bottom-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-secondary/30 to-transparent"></div>
                 </div>
-                <button type="submit" class="bg-gradient-to-br from-primary-dim to-primary text-on-primary font-bold px-10 py-4 rounded-lg shadow-[0_0_20px_rgba(204,151,255,0.3)] hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-2">
+                <button type="submit" id="generateBtn" class="bg-gradient-to-br from-primary-dim to-primary text-on-primary font-bold px-10 py-4 rounded-lg shadow-[0_0_20px_rgba(204,151,255,0.3)] hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-2">
                     <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">bolt</span>
                     GENERATE LINK
                 </button>
             </div>
             
-            <div id="resultArea" class="hidden animate-in fade-in slide-in-from-top-4">
+            <div id="resultArea" class="hidden">
                 <div class="p-4 rounded-xl bg-secondary/10 border border-secondary/20 flex items-center justify-between">
-                    <div class="flex flex-col">
+                    <div class="flex flex-col min-w-0 flex-1 mr-4">
                         <span class="text-[10px] font-bold text-secondary uppercase tracking-widest mb-1">ARCHIVE_TOKEN_GENERATED</span>
-                        <span id="shortUrlText" class="text-on-surface font-mono text-sm"></span>
+                        <span id="shortUrlText" class="text-on-surface font-mono text-sm truncate"></span>
                     </div>
-                    <button type="button" onclick="copyToClipboard()" class="p-2 hover:bg-secondary/20 rounded-lg transition-colors text-secondary">
+                    <button type="button" onclick="copyToClipboard()" class="p-2 hover:bg-secondary/20 rounded-lg transition-colors text-secondary shrink-0">
                         <span class="material-symbols-outlined">content_copy</span>
                     </button>
                 </div>
@@ -37,29 +37,29 @@
 </section>
 
 <!-- Quick Stats Bento Grid -->
-<section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-12">
-    <div class="surface-container border border-outline-variant/10 p-6 rounded-xl hover:bg-surface-bright transition-all group">
+<section class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-12">
+    <div class="bg-surface-container border border-outline-variant/10 p-6 rounded-xl hover:bg-surface-bright transition-all group">
         <p class="text-xs font-label text-on-surface-variant uppercase tracking-widest mb-2">Total Links</p>
         <div class="flex items-end justify-between">
             <h3 class="text-3xl font-display font-black text-on-surface">{{ stats.total_links }}</h3>
             <span class="material-symbols-outlined text-primary group-hover:scale-110 transition-transform">link</span>
         </div>
     </div>
-    <div class="surface-container border border-outline-variant/10 p-6 rounded-xl hover:bg-surface-bright transition-all group">
+    <div class="bg-surface-container border border-outline-variant/10 p-6 rounded-xl hover:bg-surface-bright transition-all group">
         <p class="text-xs font-label text-on-surface-variant uppercase tracking-widest mb-2">Active</p>
         <div class="flex items-end justify-between">
             <h3 class="text-3xl font-display font-black text-secondary">{{ stats.active_links }}</h3>
             <span class="material-symbols-outlined text-secondary group-hover:scale-110 transition-transform">check_circle</span>
         </div>
     </div>
-    <div class="surface-container border border-outline-variant/10 p-6 rounded-xl hover:bg-surface-bright transition-all group">
+    <div class="bg-surface-container border border-outline-variant/10 p-6 rounded-xl hover:bg-surface-bright transition-all group">
         <p class="text-xs font-label text-on-surface-variant uppercase tracking-widest mb-2">Bypassed</p>
         <div class="flex items-end justify-between">
             <h3 class="text-3xl font-display font-black text-on-surface">{{ stats.bypassed_links }}</h3>
             <span class="material-symbols-outlined text-on-surface-variant group-hover:scale-110 transition-transform">visibility_off</span>
         </div>
     </div>
-    <div class="surface-container border border-outline-variant/10 p-6 rounded-xl hover:bg-surface-bright transition-all group">
+    <div class="bg-surface-container border border-outline-variant/10 p-6 rounded-xl hover:bg-surface-bright transition-all group">
         <p class="text-xs font-label text-on-surface-variant uppercase tracking-widest mb-2">Disabled</p>
         <div class="flex items-end justify-between">
             <h3 class="text-3xl font-display font-black text-tertiary">{{ stats.disabled_links }}</h3>
@@ -81,19 +81,19 @@
     </div>
     
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div class="surface-container p-6 rounded-xl border border-outline-variant/10">
+        <div class="bg-surface-container p-6 rounded-xl border border-outline-variant/10">
             <h3 class="text-[10px] font-black tracking-[0.2em] uppercase text-on-surface-variant mb-6">Security Configuration</h3>
             <ul class="space-y-4">
                 <li class="flex justify-between items-center text-xs">
                     <span class="text-on-surface-variant">Fingerprint Check</span>
-                    <span class="{% if user.settings.check_fingerprint %}text-secondary{% else %}text-outline{% endif %} font-bold uppercase tracking-widest">
-                        {% if user.settings.check_fingerprint %}Enabled{% else %}Disabled{% endif %}
+                    <span class="{% if user.settings.enable_fingerprint_check %}text-secondary{% else %}text-outline{% endif %} font-bold uppercase tracking-widest">
+                        {% if user.settings.enable_fingerprint_check %}Enabled{% else %}Disabled{% endif %}
                     </span>
                 </li>
                 <li class="flex justify-between items-center text-xs">
                     <span class="text-on-surface-variant">Cookie Check</span>
-                    <span class="{% if user.settings.check_cookies %}text-secondary{% else %}text-outline{% endif %} font-bold uppercase tracking-widest">
-                        {% if user.settings.check_cookies %}Enabled{% else %}Disabled{% endif %}
+                    <span class="{% if user.settings.enable_cookie_check %}text-secondary{% else %}text-outline{% endif %} font-bold uppercase tracking-widest">
+                        {% if user.settings.enable_cookie_check %}Enabled{% else %}Disabled{% endif %}
                     </span>
                 </li>
                 <li class="flex justify-between items-center text-xs">
@@ -102,10 +102,16 @@
                         {% if user.settings.recaptcha_on_verify %}Enabled{% else %}Disabled{% endif %}
                     </span>
                 </li>
+                <li class="flex justify-between items-center text-xs">
+                    <span class="text-on-surface-variant">Block After 1st Visit</span>
+                    <span class="{% if user.settings.block_after_first_visit %}text-secondary{% else %}text-outline{% endif %} font-bold uppercase tracking-widest">
+                        {% if user.settings.block_after_first_visit %}Enabled{% else %}Disabled{% endif %}
+                    </span>
+                </li>
             </ul>
         </div>
         
-        <div class="surface-container p-6 rounded-xl border border-outline-variant/10">
+        <div class="bg-surface-container p-6 rounded-xl border border-outline-variant/10">
             <h3 class="text-[10px] font-black tracking-[0.2em] uppercase text-on-surface-variant mb-6">Shortener Endpoint</h3>
             <div class="bg-surface-container-high p-4 rounded-lg border border-outline-variant/20 mb-4">
                 <p class="text-[10px] font-bold text-primary uppercase tracking-[0.2em] mb-1">Domain</p>
@@ -126,32 +132,54 @@
     const urlInput = document.getElementById('urlInput');
     const resultArea = document.getElementById('resultArea');
     const shortUrlText = document.getElementById('shortUrlText');
+    const generateBtn = document.getElementById('generateBtn');
 
     createForm.onsubmit = async (e) => {
         e.preventDefault();
         const url = urlInput.value;
-        const apiKey = '{{ user.api_key }}';
+        
+        generateBtn.disabled = true;
+        generateBtn.innerHTML = '<span class="material-symbols-outlined animate-spin">progress_activity</span> GENERATING...';
         
         try {
-            const res = await fetch(`/api/create?api=${apiKey}&url=${encodeURIComponent(url)}`);
+            // POST with JSON body — API key never visible in URL bar or network tab params
+            const res = await fetch('/api/create', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ api: '{{ user.api_key }}', url: url })
+            });
             const data = await res.json();
             
             if (data.status === 'success') {
                 shortUrlText.innerText = data.shortenedUrl;
                 resultArea.classList.remove('hidden');
                 urlInput.value = '';
+                showToast('Link generated successfully!', 'success');
             } else {
-                alert('Error: ' + data.message);
+                showToast('Error: ' + data.message, 'error');
             }
         } catch (err) {
-            alert('Failed to connect to API');
+            showToast('Failed to connect to API', 'error');
+        } finally {
+            generateBtn.disabled = false;
+            generateBtn.innerHTML = '<span class="material-symbols-outlined" style="font-variation-settings: \'FILL\' 1;">bolt</span> GENERATE LINK';
         }
     };
 
     function copyToClipboard() {
         const text = shortUrlText.innerText;
-        navigator.clipboard.writeText(text);
-        alert('Copied to clipboard!');
+        navigator.clipboard.writeText(text).then(() => {
+            showToast('Copied to clipboard!', 'success');
+        }).catch(() => {
+            // Fallback for older browsers
+            const ta = document.createElement('textarea');
+            ta.value = text;
+            document.body.appendChild(ta);
+            ta.select();
+            document.execCommand('copy');
+            document.body.removeChild(ta);
+            showToast('Copied to clipboard!', 'success');
+        });
     }
 </script>
 {% endblock %}

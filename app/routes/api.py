@@ -80,8 +80,7 @@ def create_short_link():
                 
                 return jsonify({
                     'status': 'success',
-                    'shortenedUrl': start_url,
-                    'original_url': url
+                    'shortenedUrl': start_url
                 })
             else:
                 return jsonify({'status': 'error', 'message': data.get('message', 'Shortener API error')}), 400
@@ -89,7 +88,8 @@ def create_short_link():
             return jsonify({'status': 'error', 'message': 'Shortener API request failed'}), 500
             
     except Exception as e:
-        return jsonify({'status': 'error', 'message': f'Link creation failed: {str(e)}'}), 500
+        current_app.logger.error(f"Link creation error: {e}")
+        return jsonify({'status': 'error', 'message': 'Link creation failed'}), 500
 
 @api_bp.route('/api', methods=['GET', 'POST'])
 def api_alias():
@@ -185,4 +185,5 @@ def get_daily_analytics(month):
         
         return jsonify({'status': 'success', 'data': daily_stats})
     except Exception as e:
-        return jsonify({'status': 'error', 'message': str(e)}), 400
+        current_app.logger.error(f"Daily analytics error: {e}")
+        return jsonify({'status': 'error', 'message': 'Invalid date format'}), 400

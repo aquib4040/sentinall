@@ -4,8 +4,8 @@
 
 {% block content %}
 <div class="max-w-4xl mx-auto">
-    <div class="flex items-center justify-between mb-8">
-        <h2 class="text-2xl font-black tracking-tighter text-[#dee5ff] uppercase">SYSTEM_CONFIGURATION</h2>
+    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 gap-3">
+        <h2 class="text-xl sm:text-2xl font-black tracking-tighter text-[#dee5ff] uppercase">SYSTEM_CONFIGURATION</h2>
         <div class="flex items-center gap-2 px-3 py-1 bg-primary/10 border border-primary/20 rounded-full">
             <div class="w-2 h-2 rounded-full bg-primary animate-pulse"></div>
             <span class="text-[10px] font-bold text-primary tracking-widest uppercase">Live Sync</span>
@@ -13,20 +13,21 @@
     </div>
 
     {% if success %}
-    <div class="mb-8 p-4 rounded-xl bg-secondary/10 border border-secondary/30 text-secondary flex items-center gap-4 animate-in fade-in slide-in-from-top-4">
+    <div class="mb-8 p-4 rounded-xl bg-secondary/10 border border-secondary/30 text-secondary flex items-center gap-4">
         <span class="material-symbols-outlined">check_circle</span>
         <span class="text-sm font-medium tracking-wide">CONFIGURATION_SYNC_SUCCESS: {{ success }}</span>
     </div>
     {% endif %}
 
     {% if error %}
-    <div class="mb-8 p-4 rounded-xl bg-error-container/20 border border-error/30 text-error flex items-center gap-4 animate-in fade-in slide-in-from-top-4">
+    <div class="mb-8 p-4 rounded-xl bg-error/20 border border-error/30 text-error flex items-center gap-4">
         <span class="material-symbols-outlined">warning</span>
         <span class="text-sm font-medium tracking-wide">CONFIGURATION_SYNC_FAILURE: {{ error }}</span>
     </div>
     {% endif %}
 
     <form action="{{ url_for('dashboard.settings') }}" method="POST" class="space-y-8">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}"/>
         <!-- Auth & Identity -->
         <div class="glass-panel p-8 rounded-2xl border border-outline-variant/10 shadow-xl">
             <h3 class="text-xs font-black tracking-[0.3em] text-primary uppercase mb-8 flex items-center gap-3">
@@ -96,7 +97,7 @@
                         <span class="text-xs font-bold text-on-surface uppercase tracking-widest">Start Page reCAPTCHA</span>
                         <span class="text-[10px] text-on-surface-variant">Verify before redirecting to shortener</span>
                     </div>
-                    <div class="relative">
+                    <div class="relative shrink-0 ml-4">
                         <input name="recaptcha_on_start" class="peer sr-only" type="checkbox" {% if user.settings.recaptcha_on_start %}checked{% endif %}/>
                         <div class="w-10 h-6 bg-surface-container-highest rounded-full peer peer-checked:bg-secondary transition-all after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-on-surface after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-4"></div>
                     </div>
@@ -106,7 +107,7 @@
                         <span class="text-xs font-bold text-on-surface uppercase tracking-widest">Verify Page reCAPTCHA</span>
                         <span class="text-[10px] text-on-surface-variant">Final check before destination</span>
                     </div>
-                    <div class="relative">
+                    <div class="relative shrink-0 ml-4">
                         <input name="recaptcha_on_verify" class="peer sr-only" type="checkbox" {% if user.settings.recaptcha_on_verify %}checked{% endif %}/>
                         <div class="w-10 h-6 bg-surface-container-highest rounded-full peer peer-checked:bg-secondary transition-all after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-on-surface after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-4"></div>
                     </div>
@@ -123,34 +124,84 @@
             
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <label class="flex items-center justify-between p-4 rounded-xl bg-surface-container/30 border border-outline-variant/10 cursor-pointer group hover:bg-surface-container/50 transition-all">
-                    <span class="text-xs font-bold text-on-surface uppercase tracking-widest">Fingerprint Check</span>
-                    <input name="enable_fingerprint_check" class="peer sr-only" type="checkbox" {% if user.settings.enable_fingerprint_check %}checked{% endif %}/>
-                    <div class="w-10 h-6 bg-surface-container-highest rounded-full peer peer-checked:bg-tertiary transition-all after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-on-surface after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-4"></div>
+                    <div class="flex flex-col">
+                        <span class="text-xs font-bold text-on-surface uppercase tracking-widest">Fingerprint Check</span>
+                        <span class="text-[10px] text-on-surface-variant">Match device between start & verify</span>
+                    </div>
+                    <div class="relative shrink-0 ml-4">
+                        <input name="enable_fingerprint_check" class="peer sr-only" type="checkbox" {% if user.settings.enable_fingerprint_check %}checked{% endif %}/>
+                        <div class="w-10 h-6 bg-surface-container-highest rounded-full peer peer-checked:bg-tertiary transition-all after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-on-surface after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-4"></div>
+                    </div>
                 </label>
                 <label class="flex items-center justify-between p-4 rounded-xl bg-surface-container/30 border border-outline-variant/10 cursor-pointer group hover:bg-surface-container/50 transition-all">
-                    <span class="text-xs font-bold text-on-surface uppercase tracking-widest">Cookie Consistency</span>
-                    <input name="enable_cookie_check" class="peer sr-only" type="checkbox" {% if user.settings.enable_cookie_check %}checked{% endif %}/>
-                    <div class="w-10 h-6 bg-surface-container-highest rounded-full peer peer-checked:bg-tertiary transition-all after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-on-surface after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-4"></div>
+                    <div class="flex flex-col">
+                        <span class="text-xs font-bold text-on-surface uppercase tracking-widest">Cookie Consistency</span>
+                        <span class="text-[10px] text-on-surface-variant">Verify cookies match across steps</span>
+                    </div>
+                    <div class="relative shrink-0 ml-4">
+                        <input name="enable_cookie_check" class="peer sr-only" type="checkbox" {% if user.settings.enable_cookie_check %}checked{% endif %}/>
+                        <div class="w-10 h-6 bg-surface-container-highest rounded-full peer peer-checked:bg-tertiary transition-all after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-on-surface after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-4"></div>
+                    </div>
                 </label>
                 <label class="flex items-center justify-between p-4 rounded-xl bg-surface-container/30 border border-outline-variant/10 cursor-pointer group hover:bg-surface-container/50 transition-all">
-                    <span class="text-xs font-bold text-on-surface uppercase tracking-widest">Require Same IP</span>
-                    <input name="require_same_ip" class="peer sr-only" type="checkbox" {% if user.settings.require_same_ip %}checked{% endif %}/>
-                    <div class="w-10 h-6 bg-surface-container-highest rounded-full peer peer-checked:bg-tertiary transition-all after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-on-surface after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-4"></div>
+                    <div class="flex flex-col">
+                        <span class="text-xs font-bold text-on-surface uppercase tracking-widest">Require Same IP</span>
+                        <span class="text-[10px] text-on-surface-variant">Block if IP changes between steps</span>
+                    </div>
+                    <div class="relative shrink-0 ml-4">
+                        <input name="require_same_ip" class="peer sr-only" type="checkbox" {% if user.settings.require_same_ip %}checked{% endif %}/>
+                        <div class="w-10 h-6 bg-surface-container-highest rounded-full peer peer-checked:bg-tertiary transition-all after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-on-surface after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-4"></div>
+                    </div>
                 </label>
                 <label class="flex items-center justify-between p-4 rounded-xl bg-surface-container/30 border border-outline-variant/10 cursor-pointer group hover:bg-surface-container/50 transition-all">
-                    <span class="text-xs font-bold text-on-surface uppercase tracking-widest">Shortener Referer Check</span>
-                    <input name="check_shortener_referer" class="peer sr-only" type="checkbox" {% if user.settings.check_shortener_referer %}checked{% endif %}/>
-                    <div class="w-10 h-6 bg-surface-container-highest rounded-full peer peer-checked:bg-tertiary transition-all after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-on-surface after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-4"></div>
+                    <div class="flex flex-col">
+                        <span class="text-xs font-bold text-on-surface uppercase tracking-widest">Shortener Referer Check</span>
+                        <span class="text-[10px] text-on-surface-variant">Validate referer matches shortener</span>
+                    </div>
+                    <div class="relative shrink-0 ml-4">
+                        <input name="check_shortener_referer" class="peer sr-only" type="checkbox" {% if user.settings.check_shortener_referer %}checked{% endif %}/>
+                        <div class="w-10 h-6 bg-surface-container-highest rounded-full peer peer-checked:bg-tertiary transition-all after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-on-surface after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-4"></div>
+                    </div>
                 </label>
                 <label class="flex items-center justify-between p-4 rounded-xl bg-surface-container/30 border border-outline-variant/10 cursor-pointer group hover:bg-surface-container/50 transition-all">
-                    <span class="text-xs font-bold text-on-surface uppercase tracking-widest">Block on Bypass</span>
-                    <input name="block_after_bypass" class="peer sr-only" type="checkbox" {% if user.settings.block_after_bypass %}checked{% endif %}/>
-                    <div class="w-10 h-6 bg-surface-container-highest rounded-full peer peer-checked:bg-tertiary transition-all after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-on-surface after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-4"></div>
+                    <div class="flex flex-col">
+                        <span class="text-xs font-bold text-on-surface uppercase tracking-widest">Block on Bypass</span>
+                        <span class="text-[10px] text-on-surface-variant">Auto-block links on detected bypass</span>
+                    </div>
+                    <div class="relative shrink-0 ml-4">
+                        <input name="block_after_bypass" class="peer sr-only" type="checkbox" {% if user.settings.block_after_bypass %}checked{% endif %}/>
+                        <div class="w-10 h-6 bg-surface-container-highest rounded-full peer peer-checked:bg-tertiary transition-all after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-on-surface after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-4"></div>
+                    </div>
                 </label>
                 <label class="flex items-center justify-between p-4 rounded-xl bg-surface-container/30 border border-outline-variant/10 cursor-pointer group hover:bg-surface-container/50 transition-all">
-                    <span class="text-xs font-bold text-on-surface uppercase tracking-widest">Block After Use</span>
-                    <input name="block_after_verify_complete" class="peer sr-only" type="checkbox" {% if user.settings.block_after_verify_complete %}checked{% endif %}/>
-                    <div class="w-10 h-6 bg-surface-container-highest rounded-full peer peer-checked:bg-tertiary transition-all after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-on-surface after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-4"></div>
+                    <div class="flex flex-col">
+                        <span class="text-xs font-bold text-on-surface uppercase tracking-widest">Block After Use</span>
+                        <span class="text-[10px] text-on-surface-variant">Mark link as used after verify</span>
+                    </div>
+                    <div class="relative shrink-0 ml-4">
+                        <input name="block_after_verify_complete" class="peer sr-only" type="checkbox" {% if user.settings.block_after_verify_complete %}checked{% endif %}/>
+                        <div class="w-10 h-6 bg-surface-container-highest rounded-full peer peer-checked:bg-tertiary transition-all after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-on-surface after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-4"></div>
+                    </div>
+                </label>
+                <label class="flex items-center justify-between p-4 rounded-xl bg-surface-container/30 border border-outline-variant/10 cursor-pointer group hover:bg-surface-container/50 transition-all">
+                    <div class="flex flex-col">
+                        <span class="text-xs font-bold text-on-surface uppercase tracking-widest">Block After 1st Visit</span>
+                        <span class="text-[10px] text-on-surface-variant">Prevent re-initialization of link</span>
+                    </div>
+                    <div class="relative shrink-0 ml-4">
+                        <input name="block_after_first_visit" class="peer sr-only" type="checkbox" {% if user.settings.block_after_first_visit %}checked{% endif %}/>
+                        <div class="w-10 h-6 bg-surface-container-highest rounded-full peer peer-checked:bg-tertiary transition-all after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-on-surface after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-4"></div>
+                    </div>
+                </label>
+                <label class="flex items-center justify-between p-4 rounded-xl bg-surface-container/30 border border-outline-variant/10 cursor-pointer group hover:bg-surface-container/50 transition-all">
+                    <div class="flex flex-col">
+                        <span class="text-xs font-bold text-on-surface uppercase tracking-widest">Verification Time Check</span>
+                        <span class="text-[10px] text-on-surface-variant">Block speedrunning through ads</span>
+                    </div>
+                    <div class="relative shrink-0 ml-4">
+                        <input name="enable_verification_time_check" class="peer sr-only" type="checkbox" {% if user.settings.enable_verification_time_check %}checked{% endif %}/>
+                        <div class="w-10 h-6 bg-surface-container-highest rounded-full peer peer-checked:bg-tertiary transition-all after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-on-surface after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-4"></div>
+                    </div>
                 </label>
             </div>
 
@@ -180,18 +231,24 @@
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <label class="flex items-center justify-between p-4 rounded-xl bg-surface-container/30 border border-outline-variant/10 cursor-pointer group hover:bg-surface-container/50 transition-all">
                     <span class="text-xs font-bold text-on-surface uppercase tracking-widest">Auto Delete Disabled</span>
-                    <input name="auto_delete_disabled" class="peer sr-only" type="checkbox" {% if user.settings.auto_delete_disabled %}checked{% endif %}/>
-                    <div class="w-10 h-6 bg-surface-container-highest rounded-full peer peer-checked:bg-primary transition-all after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-on-surface after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-4"></div>
+                    <div class="relative shrink-0 ml-4">
+                        <input name="auto_delete_disabled" class="peer sr-only" type="checkbox" {% if user.settings.auto_delete_disabled %}checked{% endif %}/>
+                        <div class="w-10 h-6 bg-surface-container-highest rounded-full peer peer-checked:bg-primary transition-all after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-on-surface after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-4"></div>
+                    </div>
                 </label>
                 <label class="flex items-center justify-between p-4 rounded-xl bg-surface-container/30 border border-outline-variant/10 cursor-pointer group hover:bg-surface-container/50 transition-all">
                     <span class="text-xs font-bold text-on-surface uppercase tracking-widest">Store Visitor Details</span>
-                    <input name="store_visitor_details" class="peer sr-only" type="checkbox" {% if user.settings.store_visitor_details %}checked{% endif %}/>
-                    <div class="w-10 h-6 bg-surface-container-highest rounded-full peer peer-checked:bg-primary transition-all after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-on-surface after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-4"></div>
+                    <div class="relative shrink-0 ml-4">
+                        <input name="store_visitor_details" class="peer sr-only" type="checkbox" {% if user.settings.store_visitor_details %}checked{% endif %}/>
+                        <div class="w-10 h-6 bg-surface-container-highest rounded-full peer peer-checked:bg-primary transition-all after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-on-surface after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-4"></div>
+                    </div>
                 </label>
                 <label class="flex items-center justify-between p-4 rounded-xl bg-surface-container/30 border border-outline-variant/10 cursor-pointer group hover:bg-surface-container/50 transition-all">
                     <span class="text-xs font-bold text-on-surface uppercase tracking-widest">Show Visit Count</span>
-                    <input name="show_visit_count" class="peer sr-only" type="checkbox" {% if user.settings.show_visit_count %}checked{% endif %}/>
-                    <div class="w-10 h-6 bg-surface-container-highest rounded-full peer peer-checked:bg-primary transition-all after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-on-surface after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-4"></div>
+                    <div class="relative shrink-0 ml-4">
+                        <input name="show_visit_count" class="peer sr-only" type="checkbox" {% if user.settings.show_visit_count %}checked{% endif %}/>
+                        <div class="w-10 h-6 bg-surface-container-highest rounded-full peer peer-checked:bg-primary transition-all after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-on-surface after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-4"></div>
+                    </div>
                 </label>
             </div>
 

@@ -1,14 +1,49 @@
-from flask import Blueprint, render_template, request, redirect, jsonify, current_app
+from flask import Blueprint, render_template, request, redirect, jsonify, current_app, session
 from datetime import datetime, timedelta
 import random
+import secrets
 import requests
 from urllib.parse import urlparse
 from ..models.link import get_link_by_token, get_link_by_verify_token, update_link_fingerprint, mark_link_bypassed, mark_link_used
 from ..models.user import get_user_by_username
-from ..utils.security import generate_fingerprint, get_cookie_data, is_allowed_browser
+from ..utils.security import generate_fingerprint, get_cookie_data, is_allowed_browser, get_client_ip
 from ..models.database import db
 
 links_bp = Blueprint('links', __name__)
+
+# ── In-memory one-time redirect tokens (expire after 30 seconds) ──
+_redirect_tokens = {}
+
+def _create_redirect_token(original_url):
+    """Create a one-time token that maps to a URL. Never expose the URL in JSON."""
+    token = secrets.token_urlsafe(48)
+    _redirect_tokens[token] = {
+        'url': original_url,
+        'created_at': datetime.utcnow(),
+        'used': False
+    }
+    # Purge expired tokens (older than 60 seconds)
+    cutoff = datetime.utcnow() - timedelta(seconds=60)
+    expired = [k for k, v in _redirect_tokens.items() if v['created_at'] < cutoff]
+    for k in expired:
+        del _redirect_tokens[k]
+    return token
+
+def _consume_redirect_token(token):
+    """Consume a one-time redirect token. Returns URL or None."""
+    entry = _redirect_tokens.get(token)
+    if not entry:
+        return None
+    if entry['used']:
+        return None
+    if (datetime.utcnow() - entry['created_at']).total_seconds() > 30:
+        del _redirect_tokens[token]
+        return None
+    entry['used'] = True
+    url = entry['url']
+    del _redirect_tokens[token]
+    return url
+
 
 @links_bp.route('/start/<encrypted_token>')
 def start(encrypted_token):
@@ -19,9 +54,7 @@ def start(encrypted_token):
         fingerprint = generate_fingerprint()
         cookie_data = get_cookie_data()
         
-        visitor_ip = request.headers.get('X-Forwarded-For', request.remote_addr)
-        if visitor_ip and ',' in visitor_ip:
-            visitor_ip = visitor_ip.split(',')[0].strip()
+        visitor_ip = get_client_ip()
         user_agent = request.headers.get('User-Agent', 'Unknown')
         
         link = get_link_by_token(encrypted_token)
@@ -49,6 +82,11 @@ def start(encrypted_token):
                 error_message='This link has already been used.')
         
         user = get_user_by_username(link['username'])
+        if not user:
+            return render_template('errors/error.html',
+                error_title="System Error",
+                error_message="The owner of this link no longer exists.")
+                
         user_settings = user.get('settings', {})
         
         max_visits = user_settings.get('max_visits_allowed', 1)
@@ -114,9 +152,8 @@ def start(encrypted_token):
         return redirect(link['short_url'], code=302)
         
     except Exception as e:
-        return render_template('errors/500.html',
-            error_title="Error",
-            error_message=f"An error occurred: {str(e)}")
+        current_app.logger.error(f"Start route error: {e}")
+        return render_template('errors/500.html'), 500
 
 @links_bp.route('/verify/<verify_token>')
 def verify(verify_token):
@@ -127,9 +164,7 @@ def verify(verify_token):
         fingerprint = generate_fingerprint()
         cookie_data = get_cookie_data()
         
-        current_ip = request.headers.get('X-Forwarded-For', request.remote_addr)
-        if current_ip and ',' in current_ip:
-            current_ip = current_ip.split(',')[0].strip()
+        current_ip = get_client_ip()
         
         referer = request.headers.get('Referer', '')
         
@@ -158,6 +193,11 @@ def verify(verify_token):
                 error_message='This link has already been used.')
         
         user = get_user_by_username(link['username'])
+        if not user:
+            return render_template('errors/error.html',
+                error_title="System Error",
+                error_message="The owner of this link no longer exists.")
+                
         user_settings = user.get('settings', {})
         encrypted_token = link['encrypted_token']
         
@@ -200,22 +240,30 @@ def verify(verify_token):
             verify_token=verify_token)
         
     except Exception as e:
-        return render_template('errors/500.html',
-            error_title="Error",
-            error_message=f"An error occurred: {str(e)}")
+        current_app.logger.error(f"Verify route error: {e}")
+        return render_template('errors/500.html'), 500
 
 @links_bp.route('/verify-start-captcha', methods=['POST'])
 def verify_start_captcha():
     try:
+        # ── Request validation ──
+        if not request.is_json:
+            return jsonify({'status': 'error', 'message': 'Invalid request format'}), 400
+        
         data = request.get_json()
         encrypted_token = data.get('token')
         recaptcha_response = data.get('recaptcha')
+        
+        if not encrypted_token or not recaptcha_response:
+            return jsonify({'status': 'error', 'message': 'Missing required fields'}), 400
         
         link = get_link_by_token(encrypted_token)
         if not link:
             return jsonify({'status': 'error', 'message': 'Link not found'}), 404
         
         user = get_user_by_username(link['username'])
+        if not user:
+            return jsonify({'status': 'error', 'message': 'System error'}), 404
         
         # Verify reCAPTCHA
         payload = {'secret': user['recaptcha_secret_key'], 'response': recaptcha_response}
@@ -236,25 +284,40 @@ def verify_start_captcha():
             }
         )
         
-        return jsonify({'status': 'success', 'redirect_url': link['short_url']})
+        # Return opaque redirect token — short_url never touches the network tab
+        redirect_token = _create_redirect_token(link['short_url'])
+        return jsonify({'status': 'success', 'r': redirect_token})
     except Exception as e:
-        return jsonify({'status': 'error', 'message': str(e)}), 500
+        current_app.logger.error(f"Verify-start-captcha error: {e}")
+        return jsonify({'status': 'error', 'message': 'Verification failed'}), 500
 
 @links_bp.route('/verify-captcha', methods=['POST'])
 def verify_captcha():
     try:
+        # ── Request validation ──
+        if not request.is_json:
+            return jsonify({'status': 'error', 'message': 'Invalid request format'}), 400
+        
         data = request.get_json()
         encrypted_token = data.get('token')
         recaptcha_response = data.get('recaptcha')
+        
+        if not encrypted_token:
+            return jsonify({'status': 'error', 'message': 'Missing required fields'}), 400
         
         link = get_link_by_token(encrypted_token)
         if not link:
             return jsonify({'status': 'error', 'message': 'Link not found'}), 404
         
         user = get_user_by_username(link['username'])
+        if not user:
+            return jsonify({'status': 'error', 'message': 'System error'}), 404
+                
         user_settings = user.get('settings', {})
         
         if user_settings.get('recaptcha_on_verify', True):
+            if not recaptcha_response:
+                return jsonify({'status': 'error', 'message': 'reCAPTCHA is required'}), 400
             payload = {'secret': user['recaptcha_secret_key'], 'response': recaptcha_response}
             response = requests.post('https://www.google.com/recaptcha/api/siteverify', data=payload, timeout=10)
             if not response.json().get('success', False):
@@ -266,17 +329,19 @@ def verify_captcha():
                 start_time = link.get('verification_start_time')
                 if start_time and (datetime.utcnow() - start_time).total_seconds() < min_time:
                     mark_link_bypassed(encrypted_token, 'speedrun', 'Speedrunning detected!')
-                    return jsonify({'status': 'error', 'message': 'Too fast!', 'bypass_detected': True}), 403
+                    return jsonify({'status': 'error', 'message': 'Verification failed'}), 403
         
         if user_settings.get('enable_fingerprint_check', True):
             if link.get('initial_fingerprint') != link.get('final_fingerprint'):
                 mark_link_bypassed(encrypted_token, 'device_swap', 'Device swap detected!')
-                return jsonify({'status': 'error', 'message': 'Device mismatch!', 'bypass_detected': True}), 403
+                return jsonify({'status': 'error', 'message': 'Verification failed'}), 403
         
         if user_settings.get('enable_cookie_check', True):
-            if link.get('initial_cookies', {}).get('has_cookies') != link.get('final_cookies', {}).get('has_cookies'):
+            initial = link.get('initial_cookies', {})
+            final = link.get('final_cookies', {})
+            if initial.get('has_cookies') != final.get('has_cookies'):
                 mark_link_bypassed(encrypted_token, 'cookie_mismatch', 'Cookie mismatch detected!')
-                return jsonify({'status': 'error', 'message': 'Cookie mismatch!', 'bypass_detected': True}), 403
+                return jsonify({'status': 'error', 'message': 'Verification failed'}), 403
         
         db.links.update_one({'encrypted_token': encrypted_token}, {'$set': {'verification_end_time': datetime.utcnow()}})
         
@@ -285,6 +350,20 @@ def verify_captcha():
         else:
             db.links.update_one({'encrypted_token': encrypted_token}, {'$inc': {'usage_count': 1}})
         
-        return jsonify({'status': 'success', 'redirect_url': link['original_url']})
+        # ── CRITICAL: Never expose original_url in JSON response ──
+        # Instead, create a one-time opaque redirect token
+        redirect_token = _create_redirect_token(link['original_url'])
+        return jsonify({'status': 'success', 'r': redirect_token})
     except Exception as e:
-        return jsonify({'status': 'error', 'message': str(e)}), 500
+        current_app.logger.error(f"Verify-captcha error: {e}")
+        return jsonify({'status': 'error', 'message': 'Verification failed'}), 500
+
+@links_bp.route('/r/<token>')
+def secure_redirect(token):
+    """One-time opaque redirect. URL is never visible in network tab."""
+    url = _consume_redirect_token(token)
+    if not url:
+        return render_template('errors/error.html',
+            error_title="Redirect Expired",
+            error_message='This redirect token has expired or already been used. Please regenerate the link.')
+    return redirect(url, code=302)

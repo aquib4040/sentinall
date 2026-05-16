@@ -4,17 +4,17 @@
 
 {% block content %}
 <div class="max-w-6xl mx-auto">
-    <div class="flex items-center justify-between mb-12">
+    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-12 gap-6">
         <div>
             <h2 class="text-3xl font-black tracking-tighter text-on-surface uppercase mb-2">MASTER_CONTROL_UNIT</h2>
             <p class="text-xs font-mono text-on-surface-variant tracking-widest">Global platform synchronization active</p>
         </div>
-        <div class="flex gap-4">
-            <div class="surface-container px-6 py-4 rounded-2xl border border-outline-variant/10 text-center min-w-[140px]">
+        <div class="flex flex-wrap gap-4">
+            <div class="bg-surface-container px-6 py-4 rounded-2xl border border-outline-variant/10 text-center min-w-[120px]">
                 <p class="text-[10px] font-black tracking-widest text-primary uppercase mb-1">Total Users</p>
                 <p class="text-2xl font-black text-on-surface">{{ stats.total_users }}</p>
             </div>
-            <div class="surface-container px-6 py-4 rounded-2xl border border-outline-variant/10 text-center min-w-[140px]">
+            <div class="bg-surface-container px-6 py-4 rounded-2xl border border-outline-variant/10 text-center min-w-[120px]">
                 <p class="text-[10px] font-black tracking-widest text-secondary uppercase mb-1">Global Links</p>
                 <p class="text-2xl font-black text-on-surface">{{ stats.total_links }}</p>
             </div>
@@ -41,6 +41,10 @@
 
             <div class="space-y-3 mb-8">
                 <div class="flex justify-between text-xs font-mono">
+                    <span class="text-on-surface-variant">Status:</span>
+                    <span class="{% if user.status == 'active' %}text-secondary{% else %}text-error{% endif %} font-bold uppercase">{{ user.status or 'active' }}</span>
+                </div>
+                <div class="flex justify-between text-xs font-mono">
                     <span class="text-on-surface-variant">Active Links:</span>
                     <span class="text-secondary font-bold">{{ user.stats.active_links }}</span>
                 </div>
@@ -60,8 +64,8 @@
                 <a href="{{ url_for('admin.user_details', username=user.username) }}" class="flex-1 py-3 bg-surface-container-high border border-outline-variant/20 rounded-xl text-[10px] font-black tracking-widest text-center uppercase hover:bg-surface-bright transition-all">
                     INSPECT_NODE
                 </a>
-                <button onclick="toggleDisable('{{ user.username }}', {{ user.is_disabled | tojson }})" class="px-4 py-3 bg-error/10 border-error/20 rounded-xl text-error hover:bg-error/20 transition-all">
-                    <span class="material-symbols-outlined text-sm">{% if user.is_disabled %}lock_open{% else %}lock{% endif %}</span>
+                <button onclick="toggleDisable('{{ user.username }}', {{ (user.status == 'disabled') | tojson }})" class="px-4 py-3 bg-error/10 border border-error/20 rounded-xl text-error hover:bg-error/20 transition-all">
+                    <span class="material-symbols-outlined text-sm">{% if user.status == 'disabled' %}lock_open{% else %}lock{% endif %}</span>
                 </button>
             </div>
         </div>
@@ -72,11 +76,11 @@
 
 {% block scripts %}
 <script>
-    async function toggleDisable(username, currentState) {
-        if (!confirm(`Confirm ${currentState ? 'ENABLING' : 'DISABLING'} operator ${username}?`)) return;
+    async function toggleDisable(username, isCurrentlyDisabled) {
+        if (!confirm(`Confirm ${isCurrentlyDisabled ? 'ENABLING' : 'DISABLING'} operator ${username}?`)) return;
         
         try {
-            const res = await fetch(`/admin/user/${username}/disable`, { method: 'POST' });
+            const res = await fetch(`/owner/user/${username}/disable`, { method: 'POST' });
             const data = await res.json();
             if (data.status === 'success') {
                 window.location.reload();

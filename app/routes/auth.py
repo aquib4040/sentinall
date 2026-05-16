@@ -45,10 +45,7 @@ def register():
                 'settings': {
                     'verification_time_seconds': 0,
                     'auto_disable_hours': 0,
-                    'check_fingerprint': True,
-                    'check_cookies': True,
                     'auto_delete_disabled': False,
-                    'disable_link_after_use': True,
                     'recaptcha_on_start': False,
                     'recaptcha_on_verify': True,
                     'enable_verification_time_check': True,
@@ -70,8 +67,9 @@ def register():
                 success='Account created successfully! Please login.')
             
         except Exception as e:
+            current_app.logger.error(f"Registration error: {e}")
             return render_template('auth/register.html', 
-                error=f'Registration failed: {str(e)}')
+                error='Registration failed. Please try again.')
     
     return render_template('auth/register.html')
 

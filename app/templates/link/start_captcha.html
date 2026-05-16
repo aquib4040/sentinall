@@ -19,7 +19,7 @@
                 data-callback="onCaptchaVerified"></div>
 
             <button id="submitBtn" disabled
-                class="w-full bg-gradient-to-br from-primary-dim to-primary text-on-primary-container font-black py-4 px-6 rounded-md uppercase tracking-widest text-sm shadow-[0_0_25px_rgba(157,78,221,0.4)] disabled:opacity-30 disabled:cursor-not-allowed transition-all hover:brightness-110">
+                class="w-full bg-gradient-to-br from-primary-dim to-primary text-on-primary-container font-black py-4 px-6 rounded-md uppercase tracking-widest text-sm shadow-[0_0_25px_rgba(157,78,221,0.4)] disabled:opacity-30 disabled:cursor-not-allowed transition-all hover:brightness-110 flex items-center justify-center gap-2">
                 PROCEED_TO_SENTINALL
             </button>
         </form>
@@ -42,7 +42,7 @@
         if (!captchaResponse) return;
 
         submitBtn.disabled = true;
-        submitBtn.innerText = 'PROGESSING...';
+        submitBtn.innerHTML = '<span class="material-symbols-outlined animate-spin text-sm">progress_activity</span> PROCESSING...';
 
         try {
             const res = await fetch('/verify-start-captcha', {
@@ -55,17 +55,14 @@
             });
 
             const data = await res.json();
-            if (data.status === 'success') {
-                window.location.href = data.redirect_url;
+            if (data.status === 'success' && data.r) {
+                // Redirect via opaque one-time token — short_url never visible
+                window.location.href = '/r/' + data.r;
             } else {
-                alert('Error: ' + data.message);
-                grecaptcha.reset();
-                submitBtn.disabled = false;
-                submitBtn.innerText = 'PROCEED_TO_SENTINALL';
+                window.location.reload();
             }
         } catch (err) {
-            alert('Failed to connect to server');
-            submitBtn.disabled = false;
+            window.location.reload();
         }
     };
 </script>

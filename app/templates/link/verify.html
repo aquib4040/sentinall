@@ -95,7 +95,7 @@
         if (!captchaResponse) return;
 
         submitBtn.disabled = true;
-        submitBtn.innerText = 'PROCESSING...';
+        submitBtn.innerHTML = '<span class="material-symbols-outlined animate-spin text-sm">progress_activity</span> PROCESSING...';
 
         try {
             const res = await fetch('/verify-captcha', {
@@ -108,21 +108,14 @@
             });
 
             const data = await res.json();
-            if (data.status === 'success') {
-                window.location.href = data.redirect_url;
+            if (data.status === 'success' && data.r) {
+                // Redirect via opaque one-time token — original URL never visible
+                window.location.href = '/r/' + data.r;
             } else {
-                if (data.bypass_detected) {
-                    window.location.reload(); // Redirect to roast page via server-side check
-                } else {
-                    alert('Error: ' + data.message);
-                    grecaptcha.reset();
-                    submitBtn.disabled = false;
-                    submitBtn.innerText = 'Verify and Continue';
-                }
+                window.location.reload();
             }
         } catch (err) {
-            alert('Failed to connect to verification server');
-            submitBtn.disabled = false;
+            window.location.reload();
         }
     };
 </script>

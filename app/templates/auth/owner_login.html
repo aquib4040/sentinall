@@ -27,6 +27,7 @@
             </div>
 
             <form action="{{ url_for('auth.owner_login') }}" method="POST" class="space-y-8">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token }}"/>
                 <div class="space-y-6">
                     <div class="group">
                         <label class="block text-[10px] font-bold tracking-[0.2em] uppercase text-on-surface-variant mb-2 ml-1">Master_ID</label>

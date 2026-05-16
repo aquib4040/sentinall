@@ -69,7 +69,7 @@
         if (!confirm(`CRITICAL: Permanently delete ${username} and ALL associated links? This action is irreversible.`)) return;
         
         try {
-            const res = await fetch(`/admin/user/${username}/delete`, { method: 'POST' });
+            const res = await fetch(`/owner/user/${username}/delete`, { method: 'POST' });
             const data = await res.json();
             if (data.status === 'success') {
                 alert('Node successfully purged');
